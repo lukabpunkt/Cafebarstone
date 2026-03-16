@@ -946,8 +946,6 @@
             return;
           }
 
-          const accessToken = sessionData.session.access_token;
-
           const { error: updateError } = await supabaseClient
             .from("reservations")
             .update({ status: "confirmed" })
@@ -967,9 +965,6 @@
           const { data: fnData, error: fnError } =
             await supabaseClient.functions.invoke("resend-email", {
               body: { reservation_id: payload.id },
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
             });
 
           if (fnError) {
