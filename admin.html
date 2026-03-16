@@ -965,6 +965,9 @@
           const { data: fnData, error: fnError } =
             await supabaseClient.functions.invoke("resend-email", {
               body: { reservation_id: payload.id },
+              headers: {
+                apikey: supabaseKey,
+              },
             });
 
           if (fnError) {
