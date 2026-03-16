@@ -935,6 +935,19 @@
           const msgEl = adminMessage;
           msgEl.textContent = "Bestätige Reservierung …";
 
+          // Sicherstellen, dass ein gültiger Admin-Login / JWT vorhanden ist
+          const { data: sessionData, error: sessionError } =
+            await supabaseClient.auth.getSession();
+
+          if (sessionError || !sessionData || !sessionData.session) {
+            console.error("Kein gültiges Admin-Session-Token:", sessionError);
+            msgEl.textContent =
+              "Du bist nicht mehr angemeldet. Bitte neu einloggen und erneut versuchen.";
+            return;
+          }
+
+          const accessToken = sessionData.session.access_token;
+
           const { error: updateError } = await supabaseClient
             .from("reservations")
             .update({ status: "confirmed" })
@@ -942,24 +955,36 @@
 
           if (updateError) {
             console.error(updateError);
-            msgEl.textContent = "Fehler beim Bestätigen: " + (updateError.message || "Bitte erneut versuchen.");
+            msgEl.textContent =
+              "Fehler beim Bestätigen: " +
+              (updateError.message || "Bitte erneut versuchen.");
             return;
           }
 
-          msgEl.textContent = "Reservierung bestätigt. Sende Bestätigungs-E-Mail …";
+          msgEl.textContent =
+            "Reservierung bestätigt. Sende Bestätigungs-E-Mail …";
 
-          const { data: fnData, error: fnError } = await supabaseClient.functions.invoke(
-            "resend-email",
-            { body: { reservation_id: payload.id } }
-          );
+          const { data: fnData, error: fnError } =
+            await supabaseClient.functions.invoke("resend-email", {
+              body: { reservation_id: payload.id },
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            });
 
           if (fnError) {
             console.error("resend-email:", fnError, "response:", fnData);
-            const detail = (fnData && (fnData.error || fnData.details || fnData.message)) || fnError.message;
-            msgEl.textContent = "Reservierung ist bestätigt. E-Mail konnte nicht gesendet werden: " + (detail || "Bitte prüfen (Konsole).");
+            const detail =
+              (fnData &&
+                (fnData.error || fnData.details || fnData.message)) ||
+              fnError.message;
+            msgEl.textContent =
+              "Reservierung ist bestätigt. E-Mail konnte nicht gesendet werden: " +
+              (detail || "Bitte prüfen (Konsole).");
             return;
           }
-          msgEl.textContent = "Reservierung bestätigt und Bestätigungs-E-Mail gesendet.";
+          msgEl.textContent =
+            "Reservierung bestätigt und Bestätigungs-E-Mail gesendet.";
           loadReservationsForDateRange();
         }
 
