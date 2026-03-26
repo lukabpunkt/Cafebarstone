@@ -575,7 +575,8 @@ textarea.error {
 
 .aside-card h3 {
   margin: 0 0 6px;
-  font-family: "Playfair Display", serif;
+  font-family: "San Francisco", -apple-system, BlinkMacSystemFont, system-ui,
+    "Segoe UI", sans-serif;
   font-size: 16px;
   font-weight: 500;
   color: var(--color-text);
@@ -731,9 +732,10 @@ textarea.error {
             <p class="eyebrow">Café Bar Stone • Lingen (Ems)</p>
             <h1>Ihren Platz in der Café Bar Stone reservieren</h1>
             <p class="hero-text">
-              Sichern Sie dir bequem online deinen Platz – für wilde Partynächte,
-              entspannte Cocktailabende oder den besonderen Anlass mit deiner
-              Crew. Wir sorgen dafür, dass dein Abend im Stone perfekt beginnt.
+              Reservieren Sie bequem online Ihren Platz - für stimmungsvolle
+              Partynächte, entspannte Cocktailabende oder einen besonderen
+              Anlass. Wir sorgen dafür, dass Ihr Abend im Stone perfekt
+              beginnt.
             </p>
             <a href="#reservierung" class="btn btn-primary">
               Platz reservieren
@@ -742,12 +744,12 @@ textarea.error {
           <aside class="hero-sidecard">
             <p class="sidecard-title">Willkommen in der Café Bar Stone</p>
             <p>
-              Energiegeladene Nächte, satte Beats und kreative Drinks – das Stone
-              ist deine Bar und dein Nachtclub im Herzen von Lingen.
+              Energiegeladene Nächte, mitreißende Beats und kreative Drinks -
+              das Stone ist Ihre Bar und Ihr Nachtclub im Herzen von Lingen.
             </p>
             <p>
-              Mit der Online-Platzbuchung sichern wir dir und deinen Freunden
-              euren Spot – ob für den Start in die Nacht, eine Geburtstagsrunde
+              Mit der Online-Platzbuchung sichern Sie sich und Ihren Freunden
+              Ihren Platz - ob für den Start in die Nacht, eine Geburtstagsrunde
               oder einen langen Cocktailabend.
             </p>
           </aside>
@@ -771,8 +773,9 @@ textarea.error {
             <p class="eyebrow">Ihre Anfrage</p>
             <h2>Platz in der Café Bar Stone reservieren</h2>
             <p>
-              Füllen Sie das Formular aus und senden Sie uns Ihre Reservierungsanfrage
-              für den Abend. Wir bestätigen Ihre Reservierung schnellstmöglich
+              Füllen Sie das Formular aus und senden Sie uns Ihre
+              Reservierungsanfrage für den Abend. Wir bestätigen Ihre
+              Reservierung schnellstmöglich
               per E-Mail oder telefonisch.
             </p>
           </div>
@@ -851,12 +854,16 @@ textarea.error {
 
               <div class="form-row">
                 <div class="form-field">
-                  <label for="date">Datum</label>
+                  <label for="date">Datum*</label>
                   <input type="date" id="date" name="date" />
                 </div>
                 <div class="form-field">
-                  <label for="time">Uhrzeit</label>
+                  <label for="time">Uhrzeit*</label>
                   <input type="time" id="time" name="time" />
+                  <span class="field-hint">
+                    Reservierungen sind nur Donnerstag bis Samstag ab 17:00 Uhr
+                    möglich.
+                  </span>
                 </div>
               </div>
 
@@ -960,9 +967,9 @@ textarea.error {
               <p class="eyebrow">Über die Café Bar Stone</p>
               <h2>Ein Ort zum Ankommen und Bleiben</h2>
               <p>
-                "Das Stone ist eine Bar im Herzen von Lingen. Wer auf wilde
-                Partynächte oder ruhige Cocktailabende steht, ist bei uns genau
-                richtig. Bei uns finden Jung und Alt das Richtige."
+                Das Stone ist eine Bar im Herzen von Lingen. Ob wilde
+                Partynächte oder ruhige Cocktailabende - bei uns sind Sie genau
+                richtig.
               </p>
               <p>
                 Neben klassischer Bar-Atmosphäre mit Cocktails, Longdrinks und
@@ -971,8 +978,8 @@ textarea.error {
                 planen – ob für einen spontanen Drink oder eine größere Runde.
               </p>
               <p>
-                Folgen Sie uns auch auf Instagram, um aktuelle Aktionen und Events
-                der Café Bar Stone nicht zu verpassen.
+                Folgen Sie uns auch auf Instagram, um aktuelle Aktionen und
+                Events der Cafe Bar Stone nicht zu verpassen.
               </p>
             </div>
           </div>
@@ -1024,6 +1031,57 @@ textarea.error {
         );
 
         let reservationsOpen = true;
+
+        function isWithinOpeningHours(dateValue, timeValue) {
+          if (!dateValue || !timeValue) {
+            return {
+              valid: false,
+              message:
+                "Bitte wählen Sie ein Datum und eine Uhrzeit innerhalb unserer Öffnungszeiten.",
+            };
+          }
+
+          const reservationDate = new Date(`${dateValue}T12:00:00`);
+          if (Number.isNaN(reservationDate.getTime())) {
+            return {
+              valid: false,
+              message: "Das ausgewählte Datum ist ungültig.",
+            };
+          }
+
+          const openingDays = [4, 5, 6]; // Donnerstag, Freitag, Samstag
+          const day = reservationDate.getDay();
+
+          const [hoursStr, minutesStr] = String(timeValue).split(":");
+          const hours = Number(hoursStr);
+          const minutes = Number(minutesStr);
+
+          if (
+            !Number.isInteger(hours) ||
+            !Number.isInteger(minutes) ||
+            hours < 0 ||
+            hours > 23 ||
+            minutes < 0 ||
+            minutes > 59
+          ) {
+            return {
+              valid: false,
+              message: "Die ausgewählte Uhrzeit ist ungültig.",
+            };
+          }
+
+          const totalMinutes = hours * 60 + minutes;
+          const opensAtMinutes = 17 * 60;
+
+          if (!openingDays.includes(day) || totalMinutes < opensAtMinutes) {
+            return {
+              valid: false,
+              message: "Reservierungen sind nur zu den Öffnungszeiten erlaubt.",
+            };
+          }
+
+          return { valid: true };
+        }
 
         async function refreshReservationStatus() {
           try {
@@ -1078,6 +1136,8 @@ textarea.error {
             "lastName",
             "email",
             "phone",
+            "date",
+            "time",
           ];
 
           let hasError = false;
@@ -1157,6 +1217,13 @@ textarea.error {
           let reservationDateTime = null;
           if (date && time) {
             reservationDateTime = new Date(`${date}T${time}`);
+          }
+
+          const openingHoursValidation = isWithinOpeningHours(date, time);
+          if (!openingHoursValidation.valid) {
+            messageBox.textContent = openingHoursValidation.message;
+            messageBox.className = "form-message visible error";
+            return;
           }
 
           try {
