@@ -8,17 +8,27 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// CORS: Erlaube Aufruf von deiner GitHub-Pages- und lokalen Entwicklung
-// x-client-info wird vom Supabase-JS-Client gesendet und muss erlaubt sein
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "https://lukabpunkt.github.io",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-client-info, apikey",
-  "Access-Control-Max-Age": "86400",
-};
+const ALLOWED_ORIGINS = [
+  "https://lukabpunkt.github.io",
+  "http://localhost",
+  "http://127.0.0.1",
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin") ?? "";
+  const allowed = ALLOWED_ORIGINS.some((o) => origin === o || origin.startsWith(o + ":"));
+  return {
+    "Access-Control-Allow-Origin": allowed ? origin : ALLOWED_ORIGINS[0],
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, x-client-info, apikey",
+    "Access-Control-Max-Age": "86400",
+  };
+}
 
 Deno.serve(async (req) => {
-  // Preflight (OPTIONS) für CORS – Browser sendet das vor dem echten POST
+  const CORS_HEADERS = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }

@@ -83,7 +83,7 @@
       }
 
       .container {
-        width: min(100% - 24px, 1120px);
+        width: min(100% - 16px, 1120px);
         margin-inline: auto;
       }
 
@@ -114,7 +114,7 @@
       }
 
       .logo-img {
-        height: 56px;
+        height: 40px;
         width: auto;
         display: block;
         object-fit: contain;
@@ -169,12 +169,12 @@
       }
 
       main {
-        padding: 28px 0 32px;
+        padding: 16px 0 24px;
       }
 
       .card {
         border-radius: var(--radius-lg);
-        padding: 32px 48px;
+        padding: 18px 16px;
         border: 1px solid var(--color-border-soft);
         background: radial-gradient(
             circle at top left,
@@ -193,7 +193,7 @@
       }
 
       h1 {
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 500;
         margin: 8px 0 2px;
       }
@@ -293,10 +293,14 @@
 
       .admin-controls {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 10px;
-        align-items: center;
+        align-items: stretch;
         margin-bottom: 12px;
+      }
+
+      .admin-controls .btn {
+        width: 100%;
       }
 
       .admin-table-wrapper {
@@ -305,8 +309,7 @@
         max-height: min(70vh, 580px);
         overflow-y: auto;
         overflow-x: hidden;
-        padding-right: 14px;
-        margin-right: 6px;
+        padding-right: 6px;
         scrollbar-width: thin;
         scrollbar-color: rgba(201, 155, 75, 0.5) rgba(8, 10, 15, 0.8);
       }
@@ -332,17 +335,51 @@
         font-size: 14px;
       }
 
-      .admin-table th,
-      .admin-table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--color-border-soft);
-        text-align: left;
+      .admin-table thead {
+        display: none;
       }
 
-      .admin-table th {
+      .admin-table tbody tr {
+        display: block;
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-md);
+        padding: 14px 14px 10px;
+        margin-bottom: 10px;
+        background: rgba(8, 10, 15, 0.6);
+      }
+
+      .admin-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+        border-bottom: none;
+        text-align: right;
+        font-size: 13px;
+      }
+
+      .admin-table td::before {
+        content: attr(data-label);
         font-weight: 600;
         color: var(--color-text-soft);
-        white-space: nowrap;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-align: left;
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+
+      .admin-table td:last-child {
+        justify-content: flex-end;
+        gap: 8px;
+        padding-top: 10px;
+        margin-top: 6px;
+        border-top: 1px solid var(--color-border-soft);
+      }
+
+      .admin-table td:last-child::before {
+        display: none;
       }
 
       .admin-status-pill {
@@ -372,10 +409,6 @@
       .admin-status-pill.no_show {
         border-color: rgba(255, 190, 92, 0.7);
         color: #ffbe5c;
-      }
-
-      .admin-table td:last-child {
-        overflow: hidden;
       }
 
       .admin-btn {
@@ -489,7 +522,8 @@
         justify-content: flex-end;
       }
       .modal-actions .btn {
-        min-width: 120px;
+        min-width: 0;
+        flex: 1;
       }
       .modal-actions .btn-outline {
         background: transparent;
@@ -511,9 +545,10 @@
 
       .footer-inner {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         align-items: center;
-        gap: 12px;
+        text-align: center;
+        gap: 10px;
         font-size: 12px;
         color: var(--color-text-soft);
       }
@@ -533,6 +568,90 @@
         display: inline-block;
         opacity: 0.4;
         pointer-events: none;
+      }
+
+      @media (min-width: 640px) {
+        .container {
+          width: min(100% - 24px, 1120px);
+        }
+
+        main {
+          padding: 28px 0 32px;
+        }
+
+        .logo-img {
+          height: 56px;
+        }
+
+        h1 {
+          font-size: 22px;
+        }
+
+        .card {
+          padding: 32px 48px;
+        }
+
+        .admin-controls {
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: flex-end;
+        }
+
+        .admin-controls .btn {
+          width: auto;
+        }
+
+        .admin-table thead {
+          display: table-header-group;
+        }
+
+        .admin-table tbody tr {
+          display: table-row;
+          border: none;
+          border-radius: 0;
+          padding: 0;
+          margin-bottom: 0;
+          background: transparent;
+        }
+
+        .admin-table td {
+          display: table-cell;
+          text-align: left;
+          padding: 10px 12px;
+          border-bottom: 1px solid var(--color-border-soft);
+          font-size: 14px;
+        }
+
+        .admin-table td::before {
+          display: none;
+        }
+
+        .admin-table td:last-child {
+          justify-content: flex-start;
+          padding-top: 10px;
+          margin-top: 0;
+          border-top: none;
+        }
+
+        .admin-table th {
+          padding: 10px 12px;
+          border-bottom: 1px solid var(--color-border-soft);
+          text-align: left;
+          font-weight: 600;
+          color: var(--color-text-soft);
+          white-space: nowrap;
+        }
+
+        .footer-inner {
+          flex-direction: row;
+          justify-content: space-between;
+          text-align: left;
+        }
+
+        .modal-actions .btn {
+          min-width: 120px;
+          flex: 0 0 auto;
+        }
       }
 
       @media (min-width: 900px) {
@@ -642,7 +761,7 @@
             </p>
 
             <div class="admin-controls">
-              <div class="form-field" style="max-width: 220px;">
+              <div class="form-field">
                 <label for="admin-date-from">Datum von</label>
                 <input
                   type="date"
@@ -650,7 +769,7 @@
                   name="admin-date-from"
                 />
               </div>
-              <div class="form-field" style="max-width: 220px;">
+              <div class="form-field">
                 <label for="admin-date-to">Datum bis</label>
                 <input type="date" id="admin-date-to" name="admin-date-to" />
               </div>
@@ -912,14 +1031,14 @@
 
               return `
                 <tr>
-                  <td>${dateStr}</td>
-                  <td>${timeStr}</td>
-                  <td>${areaLabel}</td>
-                  <td>${row.party_size}</td>
-                  <td>${guest || "-"}</td>
+                  <td data-label="Datum">${dateStr}</td>
+                  <td data-label="Uhrzeit">${timeStr}</td>
+                  <td data-label="Bereich">${areaLabel}</td>
+                  <td data-label="Personen">${row.party_size}</td>
+                  <td data-label="Name">${guest || "-"}</td>
                   <td>
                     ${infoBtn}
-                    ${showConfirm ? "&nbsp;&nbsp;" + confirmBtn : ""}
+                    ${showConfirm ? " " + confirmBtn : ""}
                   </td>
                 </tr>
               `;
@@ -962,28 +1081,35 @@
           msgEl.textContent =
             "Reservierung bestätigt. Sende Bestätigungs-E-Mail …";
 
-          const { data: fnData, error: fnError } =
-            await supabaseClient.functions.invoke("resend-email", {
-              body: { reservation_id: payload.id },
-              headers: {
-                apikey: supabaseKey,
-              },
-            });
+          try {
+            const { data: fnData, error: fnError } =
+              await supabaseClient.functions.invoke("resend-email", {
+                body: { reservation_id: payload.id },
+              });
 
-          if (fnError) {
-            console.error("resend-email:", fnError, "response:", fnData);
-            const detail =
-              (fnData &&
-                (fnData.error || fnData.details || fnData.message)) ||
-              fnError.message;
+            if (fnError) {
+              console.error("resend-email fnError:", fnError);
+              console.error("resend-email fnData:", fnData);
+              const detail =
+                (fnData &&
+                  (fnData.error || fnData.details || fnData.message)) ||
+                fnError.message ||
+                String(fnError);
+              msgEl.textContent =
+                "Reservierung ist bestätigt. E-Mail konnte nicht gesendet werden: " +
+                detail;
+              return;
+            }
+
             msgEl.textContent =
-              "Reservierung ist bestätigt. E-Mail konnte nicht gesendet werden: " +
-              (detail || "Bitte prüfen (Konsole).");
-            return;
+              "Reservierung bestätigt und Bestätigungs-E-Mail gesendet.";
+            loadReservationsForDateRange();
+          } catch (invokeErr) {
+            console.error("Edge-Function-Aufruf fehlgeschlagen:", invokeErr);
+            msgEl.textContent =
+              "Reservierung ist bestätigt. Edge-Function-Aufruf fehlgeschlagen: " +
+              (invokeErr.message || String(invokeErr));
           }
-          msgEl.textContent =
-            "Reservierung bestätigt und Bestätigungs-E-Mail gesendet.";
-          loadReservationsForDateRange();
         }
 
         if (loginForm) {
