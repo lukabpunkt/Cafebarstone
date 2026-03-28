@@ -667,17 +667,13 @@
 
     <div id="confirm-modal-overlay" class="modal-overlay" aria-hidden="true">
       <div class="modal-card" role="dialog" aria-labelledby="confirm-modal-title">
-        <h3 id="confirm-modal-title">Reservierungen sperren?</h3>
-        <p id="confirm-modal-text">
-          Möchtest du die Online-Reservierung wirklich deaktivieren? Gäste können dann keine Plätze mehr online reservieren.
-        </p>
+        <h3 id="confirm-modal-title"></h3>
+        <p id="confirm-modal-text"></p>
         <div class="modal-actions">
           <button type="button" id="confirm-modal-cancel" class="btn btn-outline">
             Abbrechen
           </button>
-          <button type="button" id="confirm-modal-ok" class="btn btn-primary">
-            Ja, sperren
-          </button>
+          <button type="button" id="confirm-modal-ok" class="btn btn-primary"></button>
         </div>
       </div>
     </div>
@@ -787,6 +783,7 @@
                     <th>Bereich</th>
                     <th>Personen</th>
                     <th>Name</th>
+                    <th>Status</th>
                     <th>Aktionen</th>
                   </tr>
                 </thead>
@@ -994,7 +991,9 @@
               const areaLabel =
                 row.area === "smoking" ? "Raucherbereich" : "Nichtraucherbereich";
 
-              const statusClass = `admin-status-pill ${row.status}`;
+              const isConfirmed = row.status === "confirmed";
+              const statusLabel = isConfirmed ? "Bestätigt" : "Ausstehend";
+              const statusClass = `admin-status-pill ${isConfirmed ? "confirmed" : "pending"}`;
               const showConfirm = row.status !== "confirmed";
               const fullName = guest && guest !== "-" ? guest : "";
               const infoAttrs = [
@@ -1036,6 +1035,7 @@
                   <td data-label="Bereich">${areaLabel}</td>
                   <td data-label="Personen">${row.party_size}</td>
                   <td data-label="Name">${guest || "-"}</td>
+                  <td data-label="Status"><span class="${statusClass}">${statusLabel}</span></td>
                   <td>
                     ${infoBtn}
                     ${showConfirm ? " " + confirmBtn : ""}
@@ -1161,17 +1161,22 @@
           });
         }
 
-        function openConfirmModal(text) {
+        function openConfirmModal(text, options) {
+          const title = (options && options.title) || "Bist du sicher?";
+          const okLabel = (options && options.okLabel) || "Ja, bestätigen";
           return new Promise((resolve) => {
             const overlay = document.getElementById("confirm-modal-overlay");
+            const titleEl = document.getElementById("confirm-modal-title");
             const textEl = document.getElementById("confirm-modal-text");
             const cancelBtn = document.getElementById("confirm-modal-cancel");
             const okBtn = document.getElementById("confirm-modal-ok");
-            if (!overlay || !textEl || !cancelBtn || !okBtn) {
+            if (!overlay || !titleEl || !textEl || !cancelBtn || !okBtn) {
               resolve(false);
               return;
             }
+            titleEl.textContent = title;
             textEl.textContent = text;
+            okBtn.textContent = okLabel;
             overlay.classList.add("is-open");
             overlay.setAttribute("aria-hidden", "false");
 
@@ -1278,7 +1283,8 @@
               // Sicherheitsabfrage nur beim Deaktivieren (custom Modal)
               if (!nextValue) {
                 const confirmed = await openConfirmModal(
-                  "Möchtest du die Online-Reservierung wirklich deaktivieren? Gäste können dann keine Plätze mehr online reservieren."
+                  "Möchtest du die Online-Reservierung wirklich deaktivieren? Gäste können dann keine Plätze mehr online reservieren.",
+                  { title: "Reservierungen sperren?", okLabel: "Ja, sperren" }
                 );
                 if (!confirmed) {
                   adminMessage.textContent =
@@ -1361,19 +1367,36 @@
               const partySizeAttr =
                 confirmBtn.getAttribute("data-party-size") || "";
 
-              // id als String übergeben, damit UUID und Integer funktionieren
-              const payload = {
-                id,
-                email,
-                name,
-                reservationAt,
+              const displayName = name || "Gast";
+              const displayDetails = [
+                displayName,
                 areaLabel,
-                partySize: partySizeAttr ? Number(partySizeAttr) : null,
-              };
+                partySizeAttr ? partySizeAttr + " Person(en)" : "",
+              ].filter(Boolean).join(" · ");
 
               confirmBtn.disabled = true;
-              confirmReservation(payload).finally(() => {
-                confirmBtn.disabled = false;
+
+              openConfirmModal(
+                `Möchtest du die Reservierung von ${displayName} wirklich bestätigen? Es wird eine Bestätigungs-E-Mail an den Kunden gesendet.`,
+                { title: "Reservierung bestätigen?", okLabel: "Ja, bestätigen" }
+              ).then((confirmed) => {
+                if (!confirmed) {
+                  confirmBtn.disabled = false;
+                  return;
+                }
+
+                const payload = {
+                  id,
+                  email,
+                  name,
+                  reservationAt,
+                  areaLabel,
+                  partySize: partySizeAttr ? Number(partySizeAttr) : null,
+                };
+
+                confirmReservation(payload).finally(() => {
+                  confirmBtn.disabled = false;
+                });
               });
             }
           });
