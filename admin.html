@@ -111,6 +111,8 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        text-decoration: none;
+        color: inherit;
       }
 
       .logo-img {
@@ -570,6 +572,26 @@
         pointer-events: none;
       }
 
+      .footer-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .footer-links a {
+        color: var(--color-text-soft);
+        text-decoration: none;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: color 160ms ease-out;
+      }
+
+      .footer-links a:hover {
+        color: var(--color-text);
+      }
+
       @media (min-width: 640px) {
         .container {
           width: min(100% - 24px, 1120px);
@@ -702,9 +724,9 @@
 
     <header class="site-header">
       <div class="container header-inner">
-        <div class="logo">
+        <a href="index.html" class="logo">
           <img src="Stonelogo.png" alt="Café Bar Stone" class="logo-img" />
-        </div>
+        </a>
         <nav class="nav">
           <a href="index.html" class="nav-link">Zur Website</a>
         </nav>
@@ -818,6 +840,10 @@
         </div>
         <div>
           <p>© <span id="year"></span> Café Bar Stone</p>
+          <div class="footer-links">
+            <a href="impressum.html">Impressum</a>
+            <a href="datenschutz.html">Datenschutz</a>
+          </div>
         </div>
       </div>
     </footer>
