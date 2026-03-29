@@ -1697,8 +1697,20 @@ textarea.error {
             if (!reservationRes.ok) {
               const errText = await reservationRes.text();
               console.error("reservations:", errText);
-              messageBox.textContent =
-                "Fehler beim Speichern der Reservierung. Bitte versuchen Sie es später erneut.";
+              let userMessage = "Fehler beim Speichern der Reservierung. Bitte versuchen Sie es später erneut.";
+              try {
+                const errData = JSON.parse(errText);
+                if (errData.code === "P0001" && errData.message) {
+                  if (errData.message.includes("Reservierungslimit")) {
+                    userMessage = "Sie haben das Reservierungslimit erreicht. Pro E-Mail-Adresse sind maximal 5 Reservierungen innerhalb von 24 Stunden möglich. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns direkt.";
+                  } else if (errData.message.includes("zukünftige")) {
+                    userMessage = "Reservierungen können nur für zukünftige Zeitpunkte erstellt werden. Bitte wählen Sie ein Datum in der Zukunft.";
+                  } else {
+                    userMessage = errData.message;
+                  }
+                }
+              } catch (e) {}
+              messageBox.textContent = userMessage;
               messageBox.className = "form-message visible error";
               return;
             }
