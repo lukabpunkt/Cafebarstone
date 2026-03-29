@@ -1165,7 +1165,10 @@ textarea.error {
                     type="tel"
                     id="phone"
                     name="phone"
-                    placeholder="+49 ..."
+                    inputmode="tel"
+                    autocomplete="tel"
+                    placeholder="+49 …"
+                    title="Nur Ziffern, +, Leerzeichen und gängige Trennzeichen (-, /, Klammern, Punkt)."
                   />
                 </div>
               </div>
@@ -1259,7 +1262,8 @@ textarea.error {
                   <li><strong>Preisspanne:</strong> 10–20 € pro Person</li>
                   <li><strong>Kategorie:</strong> Bar</li>
                   <li>
-                    <strong>Serviceoptionen:</strong> Nur Barzahlung, Sitzplätze im
+                    <strong>Serviceoptionen:</strong> Barzahlung und Kartenzahlung,
+                    Sitzplätze im
                     Freien, Happy-Hour-Getränke
                   </li>
                   <li>
@@ -1408,6 +1412,19 @@ textarea.error {
           dateField.setAttribute("min", `${yyyy}-${mm}-${dd}`);
         }
 
+        const phoneField = document.getElementById("phone");
+        if (phoneField instanceof HTMLInputElement) {
+          const stripInvalidPhoneChars = (raw) =>
+            raw.replace(/[^\d+()\s\-/.]/g, "");
+
+          phoneField.addEventListener("input", () => {
+            const cleaned = stripInvalidPhoneChars(phoneField.value);
+            if (cleaned !== phoneField.value) {
+              phoneField.value = cleaned;
+            }
+          });
+        }
+
         let reservationsOpen = true;
 
         function isWithinOpeningHours(dateValue, timeValue) {
@@ -1551,6 +1568,13 @@ textarea.error {
             if (id === "email") {
               const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
               if (!emailRegex.test(value)) {
+                field.classList.add("error");
+                hasError = true;
+              }
+            }
+
+            if (id === "phone") {
+              if (!/\d/.test(value)) {
                 field.classList.add("error");
                 hasError = true;
               }

@@ -108,6 +108,8 @@
         align-items: center;
         justify-content: space-between;
         padding-block: 14px;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       .logo {
@@ -158,8 +160,9 @@
 
       .nav {
         display: flex;
-        gap: 16px;
+        gap: 12px;
         font-size: 12px;
+        align-items: center;
       }
 
       .nav-link {
@@ -171,6 +174,35 @@
 
       .nav-link:hover {
         color: var(--color-text);
+      }
+
+      .logout-btn {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 8px 18px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(255, 107, 107, 0.4);
+        background: rgba(255, 107, 107, 0.08);
+        color: #ff6b6b;
+        font: inherit;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background var(--transition-fast), border-color var(--transition-fast);
+      }
+
+      .logout-btn:hover,
+      .logout-btn:active {
+        background: rgba(255, 107, 107, 0.18);
+        border-color: rgba(255, 107, 107, 0.6);
+      }
+
+      .logout-btn.is-visible {
+        display: inline-flex;
       }
 
       main {
@@ -732,6 +764,7 @@
         </a>
         <nav class="nav">
           <a href="index.html" class="nav-link">Zur Website</a>
+          <button id="admin-logout-btn" class="logout-btn" type="button">Abmelden</button>
         </nav>
       </div>
     </header>
@@ -878,6 +911,7 @@
         const availabilityBtn = document.getElementById(
           "admin-toggle-reservations"
         );
+        const logoutBtn = document.getElementById("admin-logout-btn");
 
         let reservationsOpen = true;
         let businessSettingsId = null;
@@ -935,6 +969,27 @@
           if (dateToInput instanceof HTMLInputElement) {
             dateToInput.value = todayStr;
           }
+        }
+
+        if (dateFromInput instanceof HTMLInputElement) {
+          dateFromInput.addEventListener("change", () => {
+            if (dateToInput instanceof HTMLInputElement && dateFromInput.value) {
+              if (!dateToInput.value || dateToInput.value < dateFromInput.value) {
+                dateToInput.value = dateFromInput.value;
+              }
+              dateToInput.setAttribute("min", dateFromInput.value);
+            }
+          });
+        }
+
+        if (dateToInput instanceof HTMLInputElement) {
+          dateToInput.addEventListener("change", () => {
+            if (dateFromInput instanceof HTMLInputElement && dateFromInput.value) {
+              if (dateToInput.value && dateToInput.value < dateFromInput.value) {
+                dateToInput.value = dateFromInput.value;
+              }
+            }
+          });
         }
 
         async function loadReservationsForDateRange() {
@@ -1178,9 +1233,25 @@
 
             loginMessage.textContent = "Erfolgreich angemeldet.";
             dashboard.style.display = "block";
+            if (logoutBtn) logoutBtn.classList.add("is-visible");
             setToday();
             loadBusinessSettings(true);
             loadReservationsForDateRange();
+          });
+        }
+
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", async () => {
+            await supabaseClient.auth.signOut();
+            dashboard.style.display = "none";
+            logoutBtn.classList.remove("is-visible");
+            if (tableBody) tableBody.innerHTML = "";
+            if (adminMessage) adminMessage.textContent = "";
+            if (loginMessage) loginMessage.textContent = "Du wurdest erfolgreich abgemeldet.";
+            const emailInput = document.getElementById("admin-email");
+            const passwordInput = document.getElementById("admin-password");
+            if (emailInput instanceof HTMLInputElement) emailInput.value = "";
+            if (passwordInput instanceof HTMLInputElement) passwordInput.value = "";
           });
         }
 
