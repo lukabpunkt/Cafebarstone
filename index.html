@@ -8,6 +8,9 @@
       name="description"
       content="Reservieren Sie Ihren Platz in der Café Bar Stone in Lingen (Ems) – für wilde Partynächte, entspannte Cocktailabende und unvergessliche Nächte in der Bar."
     />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <style>
 :root {
   --color-bg: #07090c;
@@ -564,6 +567,18 @@ select {
   transform: translateY(-1px);
 }
 
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  opacity: 0;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  pointer-events: none;
+  tab-index: -1;
+}
+
 .dsgvo-row {
   display: flex;
   align-items: flex-start;
@@ -978,6 +993,10 @@ textarea.error {
 
           <div class="reservation-layout">
             <form id="reservation-form" class="reservation-form" novalidate>
+              <div class="hp-field" aria-hidden="true">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+              </div>
               <div class="form-row">
                 <div class="form-field">
                   <label for="salutation">Anrede*</label>
@@ -1209,7 +1228,7 @@ textarea.error {
         </div>
         <div class="footer-meta">
           <p>© <span id="year"></span> Café Bar Stone</p>
-          <a href="admin.html" class="btn btn-primary" style="margin-top: 8px;">Admin-Bereich</a>
+          <a href="admin.html" style="margin-top: 4px; display: inline-block; font-size: 10px; color: rgba(193,188,207,0.3); text-decoration: none; letter-spacing: 0.08em;">Admin</a>
         </div>
       </div>
     </footer>
@@ -1448,6 +1467,15 @@ textarea.error {
               ? "Bitte stimmen Sie der Datenschutzerklärung zu, um die Reservierung abzusenden."
               : "Bitte überprüfen Sie Ihre Eingaben. Alle Pflichtfelder müssen korrekt ausgefüllt sein.";
             messageBox.className = "form-message visible error";
+            return;
+          }
+
+          const honeypot = document.getElementById("website");
+          if (honeypot && honeypot.value) {
+            messageBox.textContent =
+              "Vielen Dank für Ihre Anfrage. Wir melden uns in Kürze.";
+            messageBox.className = "form-message visible success";
+            form.reset();
             return;
           }
 
