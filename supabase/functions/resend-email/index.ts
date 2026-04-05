@@ -208,18 +208,22 @@ Deno.serve(async (req) => {
     const when = reservation.reservation_at
       ? new Date(reservation.reservation_at)
       : null;
+    // Feste Zeitzone wie Bar-Standort (Edge-Runtime ist sonst UTC → Abweichung zur Admin-Ansicht im Browser)
+    const tz = "Europe/Berlin";
     const dateStr = when
       ? when.toLocaleDateString("de-DE", {
           weekday: "short",
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
+          timeZone: tz,
         })
       : "—";
     const timeStr = when
       ? when.toLocaleTimeString("de-DE", {
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: tz,
         })
       : "—";
 

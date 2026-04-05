@@ -1053,15 +1053,19 @@
           const rows = data
             .map((row) => {
               const when = new Date(row.reservation_at);
+              // Gleiche Zeitzone wie E-Mail (Edge Function) und Bar-Standort
+              const businessTz = "Europe/Berlin";
               const dateStr = when.toLocaleDateString("de-DE", {
                 weekday: "short",
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
+                timeZone: businessTz,
               });
               const timeStr = when.toLocaleTimeString("de-DE", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: businessTz,
               });
 
               const c = row.customers;
