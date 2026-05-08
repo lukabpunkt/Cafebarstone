@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Café Bar Stone – Platzbuchung & Infos</title>
+    <meta
+      name="description"
+      content="Reservieren Sie Ihren Platz in der Café Bar Stone in Lingen (Ems) – für wilde Partynächte, entspannte Cocktailabende und unvergessliche Nächte in der Bar."
+    />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="page-background"></div>
+    <div class="page-overlay"></div>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="header-left">
+          <a href="#" class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+            <img src="assets/Stonelogo.png" alt="Café Bar Stone" class="logo-img" />
+          </a>
+          <a href="https://www.instagram.com/stonelingen?igsh=Y3pxNmR4dHpoa3h3" target="_blank" rel="noopener" class="instagram-icon-header" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+        <button class="hamburger" id="hamburger-btn" aria-label="Menü öffnen" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-backdrop" id="nav-backdrop"></div>
+        <nav class="nav" id="nav-menu">
+          <a href="#reservierung" class="nav-link">Reservierung</a>
+          <a href="#ueber-uns" class="nav-link">Über uns</a>
+          <a href="impressum.html" class="nav-link">Impressum</a>
+          <a href="datenschutz.html" class="nav-link">Datenschutz</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-content">
+            <p class="eyebrow">Café Bar Stone • Lingen (Ems)</p>
+            <h1>Ihren Platz in der Café Bar Stone reservieren</h1>
+            <p class="hero-text">
+              Reservieren Sie bequem online Ihren Platz - für stimmungsvolle
+              Partynächte, entspannte Cocktailabende oder einen besonderen
+              Anlass. Wir sorgen dafür, dass Ihr Abend im Stone perfekt
+              beginnt.
+            </p>
+            <a href="#reservierung" class="btn btn-primary">
+              Platz reservieren
+            </a>
+          </div>
+          <aside class="hero-sidecard">
+            <p class="sidecard-title">Willkommen in der Café Bar Stone</p>
+            <p>
+              Energiegeladene Nächte, mitreißende Beats und kreative Drinks -
+              das Stone ist Ihre Bar und Ihr Nachtclub im Herzen von Lingen.
+            </p>
+            <p>
+              Mit der Online-Platzbuchung sichern Sie sich und Ihren Freunden
+              Ihren Platz - ob für den Start in die Nacht, eine Geburtstagsrunde
+              oder einen langen Cocktailabend.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="reservierung" class="reservation-section">
+        <div class="container">
+          <div
+            id="reservation-closed-banner"
+            class="reservation-closed-banner is-hidden"
+          >
+            <strong>Online-Reservierung aktuell nicht möglich.</strong>
+            <br />
+            Aktuell sind alle Plätze vergeben oder der Reservierungszeitraum ist
+            vorübergehend geschlossen. Bitte versuchen Sie es später erneut oder
+            kontaktieren Sie uns direkt in der Bar.
+          </div>
+
+          <div class="reservation-header">
+            <p class="eyebrow">Ihre Anfrage</p>
+            <h2>Platz in der Café Bar Stone reservieren</h2>
+            <p>
+              Füllen Sie das Formular aus und senden Sie uns Ihre
+              Reservierungsanfrage für den Abend. Wir bestätigen Ihre
+              Reservierung schnellstmöglich
+              per E-Mail oder telefonisch.
+            </p>
+          </div>
+
+          <div class="reservation-layout">
+            <form id="reservation-form" class="reservation-form" novalidate>
+              <div class="hp-field" aria-hidden="true">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="salutation">Anrede*</label>
+                  <div class="select-wrapper">
+                    <select id="salutation" name="salutation">
+                      <option value="">Bitte wählen</option>
+                      <option value="Frau">Frau</option>
+                      <option value="Herr">Herr</option>
+                      <option value="Divers">Divers</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="persons">Personen*</label>
+                  <input
+                    type="number"
+                    id="persons"
+                    name="persons"
+                    min="1"
+                    max="20"
+                    placeholder="z. B. 4"
+                  />
+                  <span class="field-hint">
+                    Maximal 20 Personen pro Anfrage.
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="firstName">Vorname*</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Ihr Vorname"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="lastName">Nachname*</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Ihr Nachname"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="email">E-Mail*</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="name@example.de"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="phone">Telefon*</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    inputmode="tel"
+                    autocomplete="tel"
+                    placeholder="+49 …"
+                    title="Nur Ziffern, +, Leerzeichen und gängige Trennzeichen (-, /, Klammern, Punkt)."
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="date">Datum*</label>
+                  <input type="date" id="date" name="date" />
+                </div>
+                <div class="form-field">
+                  <label for="time">Uhrzeit*</label>
+                  <input type="time" id="time" name="time" min="17:00" max="20:00" step="900" />
+                  <span class="field-hint">
+                    Reservierungen sind nur Donnerstag bis Samstag von 17:00 bis 20:00 Uhr möglich.
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <span class="label">Bereich</span>
+                  <div class="segmented-control">
+                    <label>
+                      <input
+                        type="radio"
+                        name="area"
+                        value="Nichtraucherbereich"
+                        checked
+                      />
+                      <span>Nichtraucher</span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="area"
+                        value="Raucherbereich"
+                      />
+                      <span>Raucher</span>
+                    </label>
+                  </div>
+                  <span class="field-hint">
+                    Wir versuchen Ihren Wunschbereich bestmöglich zu
+                    berücksichtigen.
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="notes">Besondere Wünsche & Anlässe</label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    rows="3"
+                    placeholder="Geburtstag, JGA, Lounge-Bereich, Musikwunsch, Allergien …"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="dsgvo-row">
+                <input type="checkbox" id="dsgvo" name="dsgvo" />
+                <label for="dsgvo" class="dsgvo-label">
+                  Ich habe die <a href="datenschutz.html" target="_blank">Datenschutzerklärung</a>
+                  gelesen und stimme der Verarbeitung meiner Daten zur Bearbeitung
+                  meiner Reservierungsanfrage zu.*
+                </label>
+              </div>
+
+              <div class="form-footer">
+                <p class="disclaimer">
+                  Ihre Daten werden ausschließlich zur Bearbeitung und Bestätigung
+                  Ihrer Reservierung verwendet. Weitere Informationen finden Sie in
+                  unserer <a href="datenschutz.html" style="color: var(--color-accent);">Datenschutzerklärung</a>.
+                  Eine endgültige Bestätigung erhalten Sie separat.
+                </p>
+                <button type="submit" class="btn btn-primary">
+                  Anfrage senden
+                </button>
+              </div>
+
+              <div id="form-message" class="form-message" aria-live="polite"></div>
+            </form>
+
+            <aside class="reservation-aside">
+              <div class="aside-card">
+                <h3>Betriebsinfos & Bewertung</h3>
+                <ul>
+                  <li><strong>Name:</strong> Café Bar Stone</li>
+                  <li><strong>Bewertung:</strong> 3,9 ★ (282 Rezensionen)</li>
+                  <li><strong>Preisspanne:</strong> 10–20 € pro Person</li>
+                  <li><strong>Kategorie:</strong> Bar</li>
+                  <li>
+                    <strong>Serviceoptionen:</strong> Barzahlung und Kartenzahlung,
+                    Sitzplätze im
+                    Freien, Happy-Hour-Getränke
+                  </li>
+                  <li>
+                    <strong>Adresse:</strong> Am Markt 26, 49808 Lingen (Ems)
+                  </li>
+                  <li><strong>Telefon:</strong> 0591 96656700</li>
+                </ul>
+              </div>
+              <div class="aside-card secondary">
+                <h3>Öffnungszeiten</h3>
+                <ul>
+                  <li>Montag: geschlossen</li>
+                  <li>Dienstag: geschlossen</li>
+                  <li>Mittwoch: geschlossen</li>
+                  <li>Donnerstag: ab 17:00 Uhr geöffnet</li>
+                  <li>Freitag: ab 17:00 Uhr geöffnet</li>
+                  <li>Samstag: ab 17:00 Uhr geöffnet</li>
+                  <li>Sonntag: geschlossen</li>
+                </ul>
+                <p class="field-hint">
+                  Öffnungszeiten können an Feiertagen abweichen. Änderungen vorbehalten.
+                </p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="ueber-uns" class="about-section">
+        <div class="container">
+          <div class="about-inner">
+            <div class="about-text">
+              <p class="eyebrow">Über die Café Bar Stone</p>
+              <h2>Ein Ort zum Ankommen und Bleiben</h2>
+              <p>
+                Das Stone ist eine Bar im Herzen von Lingen. Ob wilde
+                Partynächte oder ruhige Cocktailabende - bei uns sind Sie genau
+                richtig.
+              </p>
+              <p>
+                Neben klassischer Bar-Atmosphäre mit Cocktails, Longdrinks und
+                Happy-Hour-Angeboten bieten wir gemütliche Plätze im Innen- und
+                Außenbereich. Ihre Platzbuchung hilft uns, Ihren Abend optimal zu
+                planen – ob für einen spontanen Drink oder eine größere Runde.
+              </p>
+              <p>
+                Folgen Sie uns auch auf Instagram, um aktuelle Aktionen und
+                Events der Cafe Bar Stone nicht zu verpassen.
+              </p>
+              <a href="https://www.instagram.com/stonelingen?igsh=Y3pxNmR4dHpoa3h3" target="_blank" rel="noopener" class="instagram-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                @stonelingen
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <p class="footer-title">Café Bar Stone</p>
+          <p>Bar · Platzbuchung &amp; Reservierung</p>
+          <div class="footer-links" style="margin-top: 6px;">
+            <a href="impressum.html">Impressum</a>
+            <a href="datenschutz.html">Datenschutz</a>
+          </div>
+        </div>
+        <div class="footer-watermark">
+          <img src="assets/Watermark_white.png" alt="" class="footer-watermark-img" />
+        </div>
+        <div class="footer-meta">
+          <p>© <span id="year"></span> Café Bar Stone</p>
+          <a href="management-stone.html" style="margin-top: 4px; display: inline-block; font-size: 10px; color: rgba(193,188,207,0.3); text-decoration: none; letter-spacing: 0.08em;">Admin</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const supabaseUrl = "https://vhpqwuplwoycimewxmai.supabase.co";
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocHF3dXBsd295Y2ltZXd4bWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NzI0MDMsImV4cCI6MjA4ODE0ODQwM30.AHQkEv5zZAtRzt4yhUReQsrl-fo-ZaEE0QpHZfOID1s";
+      const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+    <script src="assets/script.js"></script>
+  </body>
+</html>

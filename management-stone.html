@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Café Bar Stone – Admin Dashboard</title>
+    <meta
+      name="description"
+      content="Internes Dashboard der Café Bar Stone für Reservierungsübersicht."
+    />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="page-background"></div>
+    <div class="page-overlay"></div>
+
+    <div id="confirm-modal-overlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-labelledby="confirm-modal-title">
+        <h3 id="confirm-modal-title"></h3>
+        <p id="confirm-modal-text"></p>
+        <div class="modal-actions">
+          <button type="button" id="confirm-modal-cancel" class="btn btn-outline">
+            Abbrechen
+          </button>
+          <button type="button" id="confirm-modal-ok" class="btn btn-primary"></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="info-modal-overlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-labelledby="info-modal-title">
+        <h3 id="info-modal-title">Reservierungsdetails</h3>
+        <p id="info-modal-basic"></p>
+        <p id="info-modal-contact"></p>
+        <div id="info-modal-notes" class="modal-notes"></div>
+        <div class="modal-actions">
+          <button type="button" id="info-modal-close" class="btn btn-outline">
+            Schließen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="logo">
+          <img src="assets/Stonelogo.png" alt="Café Bar Stone" class="logo-img" />
+        </a>
+        <nav class="nav">
+          <a href="index.html" class="nav-link">Zur Website</a>
+          <button id="admin-logout-btn" class="logout-btn" type="button">Abmelden</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="grid">
+          <div class="card">
+            <p class="eyebrow">Intern</p>
+            <h1>Admin-Anmeldung</h1>
+            <p class="subtitle">
+              Melde dich mit deinem Admin-Zugang an, um Reservierungen nach Datum
+              einzusehen.
+            </p>
+            <form id="admin-login-form">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="admin-email">Admin E-Mail</label>
+                  <input
+                    type="email"
+                    id="admin-email"
+                    name="admin-email"
+                    placeholder="admin@example.com"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="admin-password">Passwort</label>
+                  <input
+                    type="password"
+                    id="admin-password"
+                    name="admin-password"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Anmelden</button>
+              <p id="admin-login-message" class="admin-message"></p>
+            </form>
+          </div>
+
+          <div class="card" id="admin-dashboard" style="display: none;">
+            <p class="eyebrow">Reservierungen</p>
+            <h1>Übersicht nach Datum</h1>
+            <p class="subtitle">
+              Wähle ein Datum, um alle Reservierungen dieses Tages zu sehen.
+            </p>
+
+            <div class="admin-controls">
+              <div class="form-field">
+                <label for="admin-date-from">Datum von</label>
+                <input type="date" id="admin-date-from" name="admin-date-from" />
+              </div>
+              <div class="form-field">
+                <label for="admin-date-to">Datum bis</label>
+                <input type="date" id="admin-date-to" name="admin-date-to" />
+              </div>
+              <button id="admin-reload" class="btn btn-primary" type="button">
+                Reservierungen laden
+              </button>
+            </div>
+
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th>Uhrzeit</th>
+                    <th>Bereich</th>
+                    <th>Pers.</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Aktionen</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-reservations-body"></tbody>
+              </table>
+            </div>
+
+            <div class="admin-controls" style="margin-top: 18px;">
+              <button id="admin-toggle-reservations" class="btn btn-primary" type="button">
+                Reservierungen sperren (alle Plätze belegt)
+              </button>
+            </div>
+
+            <p id="admin-message" class="admin-message"></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <div>
+          <p class="footer-title">Café Bar Stone</p>
+          <p>Admin-Dashboard</p>
+        </div>
+        <div class="footer-watermark">
+          <img src="assets/Watermark_white.png" alt="" class="footer-watermark-img" />
+        </div>
+        <div>
+          <p>© <span id="year"></span> Café Bar Stone</p>
+          <div class="footer-links">
+            <a href="impressum.html">Impressum</a>
+            <a href="datenschutz.html">Datenschutz</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const supabaseUrl = "https://vhpqwuplwoycimewxmai.supabase.co";
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocHF3dXBsd295Y2ltZXd4bWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NzI0MDMsImV4cCI6MjA4ODE0ODQwM30.AHQkEv5zZAtRzt4yhUReQsrl-fo-ZaEE0QpHZfOID1s";
+      const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+    <script src="assets/admin.js"></script>
+  </body>
+</html>

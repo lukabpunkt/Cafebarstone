@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Datenschutzerklärung – Café Bar Stone</title>
+    <meta
+      name="description"
+      content="Datenschutzerklärung der Café Bar Stone in Lingen (Ems)."
+    />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <style>
+:root {
+  --color-bg: #07090c;
+  --color-bg-elevated: rgba(10, 12, 17, 0.94);
+  --color-bg-elevated-soft: rgba(16, 19, 26, 0.96);
+  --color-accent: #c99b4b;
+  --color-accent-soft: rgba(201, 155, 75, 0.12);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-soft: rgba(255, 255, 255, 0.06);
+  --color-text: #f7f3ea;
+  --color-text-soft: #c1bccf;
+  --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.8);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-pill: 999px;
+  --transition-fast: 160ms ease-out;
+  --transition-med: 220ms ease-out;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: "San Francisco", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+body { min-height: 100vh; position: relative; }
+
+.page-background {
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(circle at top left, rgba(201,155,75,0.15), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(42,71,94,0.55), transparent 60%);
+  filter: grayscale(0.3) saturate(0.8);
+  z-index: -2;
+}
+
+.page-overlay {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(0,0,0,0.6), transparent),
+    linear-gradient(to bottom, rgba(4,6,10,0.94), rgba(2,2,4,0.96));
+  z-index: -1;
+}
+
+.container { width: min(100% - 24px, 780px); margin-inline: auto; }
+
+.site-header {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(18px);
+  background: linear-gradient(to bottom, rgba(3,4,7,0.95), rgba(3,4,7,0.85));
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-block: 16px;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.logo-img { height: 56px; width: auto; display: block; object-fit: contain; }
+
+.hamburger {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 5px; width: 32px; height: 32px; background: none;
+  border: none; cursor: pointer; padding: 4px; z-index: 31;
+}
+.hamburger span {
+  display: block; width: 100%; height: 2px; background: var(--color-text);
+  border-radius: 2px; transition: transform 220ms ease-out, opacity 160ms ease-out;
+  transform-origin: center;
+}
+.hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav {
+  position: fixed; top: 0; right: 0; width: min(280px, 80vw); height: 100vh;
+  background: linear-gradient(to bottom, rgba(6,8,12,0.98), rgba(4,5,8,0.99));
+  backdrop-filter: blur(24px); border-left: 1px solid var(--color-border-soft);
+  flex-direction: column; align-items: flex-start; gap: 0;
+  padding: 80px 28px 40px; z-index: 30;
+  transform: translateX(100%); transition: transform 280ms ease-out;
+  overflow-y: auto;
+}
+.nav.is-open { transform: translateX(0); }
+
+.nav-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 29;
+}
+.nav-backdrop.is-open { display: block; }
+
+.nav-link {
+  font-size: 15px; text-decoration: none; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--color-text-soft);
+  padding: 14px 0; position: relative; display: block; width: 100%;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.nav-link:last-child { border-bottom: none; }
+.nav-link::after {
+  content: ""; position: absolute; left: 0; bottom: -1px;
+  width: 0; height: 1px; background: var(--color-accent);
+  transition: width 220ms ease-out;
+}
+.nav-link:hover { color: var(--color-text); }
+.nav-link:hover::after { width: 100%; }
+
+main { padding: 40px 0 50px; }
+
+.legal-card {
+  background: var(--color-bg-elevated-soft);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-soft);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-soft);
+}
+
+.eyebrow {
+  text-transform: uppercase; letter-spacing: 0.24em;
+  font-size: 11px; color: var(--color-accent);
+}
+
+h1 {
+  font-size: clamp(22px, 3.5vw, 30px); font-weight: 500;
+  margin: 10px 0 6px;
+}
+
+.legal-card h2 {
+  font-size: 18px; font-weight: 500; margin: 28px 0 8px;
+  color: var(--color-accent);
+}
+
+.legal-card h3 {
+  font-size: 15px; font-weight: 600; margin: 20px 0 6px;
+}
+
+.legal-card p, .legal-card li {
+  font-size: 14px; line-height: 1.8; color: var(--color-text-soft);
+  margin: 0 0 8px;
+}
+
+.legal-card ul { padding-left: 20px; margin: 0 0 12px; }
+.legal-card li { margin-bottom: 4px; }
+
+.legal-card a { color: var(--color-accent); text-decoration: underline; }
+.legal-card a:hover { color: var(--color-text); }
+
+.placeholder {
+  color: var(--color-accent);
+  background: rgba(201,155,75,0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-style: italic;
+}
+
+.site-footer {
+  border-top: 1px solid var(--color-border-soft);
+  background: rgba(3,4,7,0.96);
+  padding: 16px 0 22px;
+}
+
+.footer-inner {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 8px; font-size: 12px; color: var(--color-text-soft);
+}
+
+.footer-links { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.footer-links a {
+  color: var(--color-text-soft); text-decoration: none;
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.footer-links a:hover { color: var(--color-text); }
+
+.footer-watermark { text-align: center; }
+.footer-watermark-img {
+  max-width: 140px; height: auto; display: inline-block;
+  opacity: 0.4; pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .legal-card { padding: 40px 44px; }
+  .footer-inner {
+    flex-direction: row; justify-content: space-between; text-align: left;
+  }
+  .hamburger { display: none; }
+  .nav-backdrop { display: none !important; }
+  .nav {
+    position: static; width: auto; height: auto; background: none;
+    backdrop-filter: none; border-left: none; flex-direction: row;
+    align-items: center; gap: 18px; padding: 0; transform: none;
+    overflow-y: visible;
+  }
+  .nav-link {
+    font-size: 14px; padding: 4px 0; border-bottom: none;
+    width: auto; display: inline-flex;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <div class="page-background"></div>
+    <div class="page-overlay"></div>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="logo">
+          <img src="assets/Stonelogo.png" alt="Café Bar Stone" class="logo-img" />
+        </a>
+        <button class="hamburger" id="hamburger-btn" aria-label="Menü öffnen" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-backdrop" id="nav-backdrop"></div>
+        <nav class="nav" id="nav-menu">
+          <a href="index.html#reservierung" class="nav-link">Reservierung</a>
+          <a href="index.html#ueber-uns" class="nav-link">Über uns</a>
+          <a href="impressum.html" class="nav-link">Impressum</a>
+          <a href="datenschutz.html" class="nav-link">Datenschutz</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="legal-card">
+          <p class="eyebrow">Rechtliches</p>
+          <h1>Datenschutzerklärung</h1>
+
+          <h2>1. Datenschutz auf einen Blick</h2>
+
+          <h3>Allgemeine Hinweise</h3>
+          <p>
+            Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit
+            Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen.
+            Personenbezogene Daten sind alle Daten, mit denen Sie persönlich
+            identifiziert werden können. Ausführliche Informationen zum Thema
+            Datenschutz entnehmen Sie unserer nachfolgenden Datenschutzerklärung.
+          </p>
+
+          <h3>Datenerfassung auf dieser Website</h3>
+          <p>
+            <strong>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</strong><br />
+            Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber.
+            Dessen Kontaktdaten können Sie dem
+            <a href="impressum.html">Impressum</a> dieser Website entnehmen.
+          </p>
+          <p>
+            <strong>Wie erfassen wir Ihre Daten?</strong><br />
+            Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen.
+            Hierbei kann es sich z. B. um Daten handeln, die Sie in unser
+            Reservierungsformular eingeben (Name, E-Mail, Telefonnummer, Datum,
+            Personenanzahl, Bereichswunsch, besondere Wünsche).
+          </p>
+          <p>
+            Andere Daten werden automatisch oder nach Ihrer Einwilligung beim Besuch
+            der Website durch unsere IT-Systeme erfasst. Das sind vor allem technische
+            Daten (z. B. Internetbrowser, Betriebssystem oder Uhrzeit des
+            Seitenaufrufs).
+          </p>
+          <p>
+            <strong>Wofür nutzen wir Ihre Daten?</strong><br />
+            Ein Teil der Daten wird erhoben, um eine fehlerfreie Bereitstellung der
+            Website zu gewährleisten. Andere Daten (insbesondere die Daten aus dem
+            Reservierungsformular) werden zur Bearbeitung und Bestätigung Ihrer
+            Reservierungsanfrage verwendet.
+          </p>
+          <p>
+            <strong>Welche Rechte haben Sie bezüglich Ihrer Daten?</strong><br />
+            Sie haben jederzeit das Recht, unentgeltlich Auskunft über Herkunft,
+            Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu
+            erhalten. Sie haben außerdem ein Recht, die Berichtigung oder Löschung
+            dieser Daten zu verlangen. Wenn Sie eine Einwilligung zur
+            Datenverarbeitung erteilt haben, können Sie diese jederzeit für die
+            Zukunft widerrufen. Hierzu sowie zu weiteren Fragen zum Thema
+            Datenschutz können Sie sich jederzeit an uns wenden.
+          </p>
+
+          <h2>2. Hosting</h2>
+          <p>
+            Diese Website wird bei <strong>GitHub Pages</strong> gehostet. Anbieter
+            ist die GitHub Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA.
+          </p>
+          <p>
+            Wenn Sie diese Website besuchen, werden durch GitHub automatisch
+            verschiedene Server-Logfiles erfasst. Details entnehmen Sie der
+            Datenschutzerklärung von GitHub:
+            <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">
+              GitHub Privacy Statement
+            </a>.
+          </p>
+          <p>
+            Die Verwendung von GitHub Pages erfolgt auf Grundlage von Art. 6 Abs. 1
+            lit. f DSGVO. Wir haben ein berechtigtes Interesse an einer
+            zuverlässigen Darstellung unserer Website.
+          </p>
+
+          <h2>3. Allgemeine Hinweise und Pflichtinformationen</h2>
+
+          <h3>Datenschutz</h3>
+          <p>
+            Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten
+            sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und
+            entsprechend den gesetzlichen Datenschutzvorschriften sowie dieser
+            Datenschutzerklärung.
+          </p>
+
+          <h3>Verantwortliche Stelle</h3>
+          <p>
+            Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:
+          </p>
+          <p>
+            <strong>Café Bar Stone</strong><br />
+            <span class="placeholder">[Vor- und Nachname des Inhabers]</span><br />
+            Am Markt 26<br />
+            49808 Lingen (Ems)<br /><br />
+            Telefon: 0591 96656700<br />
+            E-Mail: <span class="placeholder">[E-Mail-Adresse eintragen]</span>
+          </p>
+          <p>
+            Verantwortliche Stelle ist die natürliche oder juristische Person, die
+            allein oder gemeinsam mit anderen über die Zwecke und Mittel der
+            Verarbeitung von personenbezogenen Daten entscheidet.
+          </p>
+
+          <h3>Speicherdauer</h3>
+          <p>
+            Soweit innerhalb dieser Datenschutzerklärung keine speziellere
+            Speicherdauer genannt wurde, verbleiben Ihre personenbezogenen Daten
+            bei uns, bis der Zweck für die Datenverarbeitung entfällt.
+            Reservierungsdaten werden nach Ablauf des Reservierungsdatums für
+            maximal <span class="placeholder">[z. B. 90 Tage / 6 Monate / 1 Jahr]</span>
+            aufbewahrt und anschließend gelöscht, sofern keine gesetzlichen
+            Aufbewahrungspflichten entgegenstehen.
+          </p>
+
+          <h3>Widerruf Ihrer Einwilligung zur Datenverarbeitung</h3>
+          <p>
+            Viele Datenverarbeitungsvorgänge sind nur mit Ihrer ausdrücklichen
+            Einwilligung möglich. Sie können eine bereits erteilte Einwilligung
+            jederzeit widerrufen. Die Rechtmäßigkeit der bis zum Widerruf erfolgten
+            Datenverarbeitung bleibt vom Widerruf unberührt.
+          </p>
+
+          <h3>Recht auf Datenübertragbarkeit</h3>
+          <p>
+            Sie haben das Recht, Daten, die wir auf Grundlage Ihrer Einwilligung
+            oder in Erfüllung eines Vertrags automatisiert verarbeiten, an sich oder
+            an einen Dritten in einem gängigen, maschinenlesbaren Format aushändigen
+            zu lassen.
+          </p>
+
+          <h3>Auskunft, Berichtigung und Löschung</h3>
+          <p>
+            Sie haben im Rahmen der geltenden gesetzlichen Bestimmungen jederzeit
+            das Recht auf unentgeltliche Auskunft über Ihre gespeicherten
+            personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der
+            Datenverarbeitung und ggf. ein Recht auf Berichtigung oder Löschung
+            dieser Daten.
+          </p>
+
+          <h3>Recht auf Einschränkung der Verarbeitung</h3>
+          <p>
+            Sie haben das Recht, die Einschränkung der Verarbeitung Ihrer
+            personenbezogenen Daten zu verlangen.
+          </p>
+
+          <h3>Beschwerderecht bei der zuständigen Aufsichtsbehörde</h3>
+          <p>
+            Im Falle von Verstößen gegen die DSGVO steht den Betroffenen ein
+            Beschwerderecht bei einer Aufsichtsbehörde zu. Die zuständige
+            Aufsichtsbehörde ist:
+          </p>
+          <p>
+            Die Landesbeauftragte für den Datenschutz Niedersachsen<br />
+            Prinzenstraße 5<br />
+            30159 Hannover<br />
+            <a href="https://www.lfd.niedersachsen.de" target="_blank" rel="noopener">
+              www.lfd.niedersachsen.de
+            </a>
+          </p>
+
+          <h2>4. Datenerfassung auf dieser Website</h2>
+
+          <h3>Reservierungsformular</h3>
+          <p>
+            Wenn Sie über unser Online-Reservierungsformular eine Anfrage stellen,
+            werden folgende personenbezogene Daten erhoben:
+          </p>
+          <ul>
+            <li>Anrede</li>
+            <li>Vorname und Nachname</li>
+            <li>E-Mail-Adresse</li>
+            <li>Telefonnummer</li>
+            <li>Gewünschtes Datum und Uhrzeit</li>
+            <li>Personenanzahl</li>
+            <li>Bereichswunsch (Raucher / Nichtraucher)</li>
+            <li>Besondere Wünsche (freiwillige Angabe)</li>
+          </ul>
+          <p>
+            <strong>Zweck der Verarbeitung:</strong> Bearbeitung, Verwaltung und
+            Bestätigung Ihrer Reservierungsanfrage per E-Mail.
+          </p>
+          <p>
+            <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO
+            (Einwilligung) sowie Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche
+            Maßnahmen auf Anfrage der betroffenen Person).
+          </p>
+          <p>
+            <strong>Speicherung:</strong> Die Daten werden in einer Datenbank bei
+            <strong>Supabase</strong> (Supabase Inc., USA) gespeichert. Supabase
+            verarbeitet Daten auf Servern in der EU (Frankfurt, Deutschland).
+            Weitere Informationen:
+            <a href="https://supabase.com/privacy" target="_blank" rel="noopener">
+              Supabase Privacy Policy
+            </a>.
+          </p>
+
+          <h3>Bestätigungs-E-Mails</h3>
+          <p>
+            Bei Bestätigung Ihrer Reservierung durch unser Team wird eine
+            Bestätigungs-E-Mail an die von Ihnen angegebene E-Mail-Adresse gesendet.
+            Der E-Mail-Versand erfolgt über den Dienst <strong>Resend</strong>
+            (Resend Inc., USA). Dabei wird Ihre E-Mail-Adresse an Resend übermittelt.
+            Weitere Informationen:
+            <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">
+              Resend Privacy Policy
+            </a>.
+          </p>
+          <p>
+            <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO
+            (Einwilligung) und Art. 6 Abs. 1 lit. b DSGVO.
+          </p>
+
+          <h3>CDN / Externe Ressourcen</h3>
+          <p>
+            Diese Website bindet JavaScript-Bibliotheken über das CDN
+            <strong>jsDelivr</strong> ein (Supabase JS Client). Beim Abruf dieser
+            Ressourcen wird Ihre IP-Adresse an die Server von jsDelivr übermittelt.
+            Weitere Informationen:
+            <a href="https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net" target="_blank" rel="noopener">
+              jsDelivr Privacy Policy
+            </a>.
+          </p>
+
+          <h2>5. Drittanbieter und externe Dienste</h2>
+
+          <h3>Supabase</h3>
+          <p>
+            Wir nutzen Supabase als Backend-Dienst für die Speicherung von
+            Reservierungsdaten und die Authentifizierung im Admin-Bereich. Die
+            Datenverarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b und f
+            DSGVO. <span class="placeholder">[Falls ein Auftragsverarbeitungsvertrag
+            (AVV) mit Supabase geschlossen wurde, hier erwähnen.]</span>
+          </p>
+
+          <h3>Resend</h3>
+          <p>
+            Für den Versand von Bestätigungs-E-Mails nutzen wir den Dienst Resend.
+            Die Datenverarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. a
+            und b DSGVO. <span class="placeholder">[Falls ein AVV mit Resend
+            geschlossen wurde, hier erwähnen.]</span>
+          </p>
+
+          <h2>6. Ihre Rechte im Überblick</h2>
+          <p>Nach der DSGVO stehen Ihnen folgende Rechte zu:</p>
+          <ul>
+            <li><strong>Auskunftsrecht</strong> (Art. 15 DSGVO)</li>
+            <li><strong>Recht auf Berichtigung</strong> (Art. 16 DSGVO)</li>
+            <li><strong>Recht auf Löschung</strong> (Art. 17 DSGVO)</li>
+            <li><strong>Recht auf Einschränkung der Verarbeitung</strong> (Art. 18 DSGVO)</li>
+            <li><strong>Recht auf Datenübertragbarkeit</strong> (Art. 20 DSGVO)</li>
+            <li><strong>Widerspruchsrecht</strong> (Art. 21 DSGVO)</li>
+            <li><strong>Recht auf Widerruf der Einwilligung</strong> (Art. 7 Abs. 3 DSGVO)</li>
+            <li><strong>Beschwerderecht bei einer Aufsichtsbehörde</strong> (Art. 77 DSGVO)</li>
+          </ul>
+          <p>
+            Zur Ausübung Ihrer Rechte wenden Sie sich bitte an die im
+            <a href="impressum.html">Impressum</a> genannte Kontaktadresse.
+          </p>
+
+          <p style="margin-top: 28px; font-size: 12px; color: rgba(193,188,207,0.6);">
+            Stand: <span class="placeholder">[Datum eintragen, z. B. März 2026]</span>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <p>© <span id="year"></span> Café Bar Stone</p>
+        </div>
+        <div class="footer-watermark">
+          <img src="assets/Watermark_white.png" alt="" class="footer-watermark-img" />
+        </div>
+        <div class="footer-links">
+          <a href="index.html">Reservierung</a>
+          <a href="impressum.html">Impressum</a>
+          <a href="datenschutz.html">Datenschutz</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const y = document.getElementById("year");
+      if (y) y.textContent = String(new Date().getFullYear());
+
+      const hb = document.getElementById("hamburger-btn");
+      const nm = document.getElementById("nav-menu");
+      const nb = document.getElementById("nav-backdrop");
+      function toggleNav() {
+        const open = nm.classList.toggle("is-open");
+        hb.classList.toggle("is-open", open);
+        nb.classList.toggle("is-open", open);
+        hb.setAttribute("aria-expanded", String(open));
+        document.body.style.overflow = open ? "hidden" : "";
+      }
+      function closeNav() {
+        nm.classList.remove("is-open");
+        hb.classList.remove("is-open");
+        nb.classList.remove("is-open");
+        hb.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+      }
+      if (hb) hb.addEventListener("click", toggleNav);
+      if (nb) nb.addEventListener("click", closeNav);
+      if (nm) nm.querySelectorAll(".nav-link").forEach(l => l.addEventListener("click", closeNav));
+    </script>
+  </body>
+</html>

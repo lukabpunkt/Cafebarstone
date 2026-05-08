@@ -1,0 +1,32 @@
+# Environment and secrets (never commit these)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Logs and cache
+*.log
+.cache/
+
+# Supabase CLI temp files (contain project ref, DB URLs)
+supabase/.temp/
+
+# Claude memory (local only)
+.claude/
+
+# Optional: uncomment if you add a build step later
+# dist/
+# build/
