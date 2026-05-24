@@ -108,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
         party_size,
         status,
         special_requests,
+        confirmed_by,
+        confirmed_at,
         customers (
           salutation,
           first_name,
@@ -133,6 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const businessTz = "Europe/Berlin";
 
+    // Resolve confirmed_by UUIDs to emails in one batch
+    const confirmedByIds = [...new Set(data.map(r => r.confirmed_by).filter(Boolean))];
+    const confirmedByMap = {};
+    for (const uid of confirmedByIds) {
+      const { data: emailData } = await supabaseClient.rpc("get_auth_user_email", { user_id: uid });
+      if (emailData) confirmedByMap[uid] = emailData;
+    }
+
     const rows = data.map((row) => {
       const when = new Date(row.reservation_at);
       const dateStr = when.toLocaleDateString("de-DE", {
@@ -151,6 +161,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const statusLabelMap = { confirmed: "Bestätigt", cancelled: "Abgelehnt", pending: "Ausstehend" };
       const statusLabel = statusLabelMap[row.status] ?? "Ausstehend";
       const statusClass = `admin-status-pill ${row.status === "confirmed" ? "confirmed" : row.status === "cancelled" ? "cancelled" : "pending"}`;
+
+      const confirmedByEmail = row.confirmed_by ? (confirmedByMap[row.confirmed_by] || row.confirmed_by) : null;
+      const confirmedAtStr = row.confirmed_at
+        ? new Date(row.confirmed_at).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: businessTz })
+        : null;
+      const confirmedByCell = confirmedByEmail
+        ? `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);">${confirmedByEmail}<br><span style="font-size:11px;opacity:0.7;">${confirmedAtStr}</span></span></td>`
+        : `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);opacity:0.4;">—</span></td>`;
       const showConfirm = row.status === "pending";
       const showReject = row.status === "pending";
       const fullName = guest !== "-" ? guest : "";
@@ -192,6 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td data-label="Personen">${row.party_size}</td>
           <td data-label="Name">${guest || "-"}</td>
           <td data-label="Status"><span class="${statusClass}">${statusLabel}</span></td>
+          ${confirmedByCell}
           <td class="admin-actions-cell">${infoBtn}${confirmBtn}${rejectBtn}</td>
         </tr>
       `;
@@ -214,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const { error: updateError } = await supabaseClient
       .from("reservations")
-      .update({ status: "confirmed" })
+      .update({ status: "confirmed", confirmed_by: sessionData.session.user.id, confirmed_at: new Date().toISOString() })
       .eq("id", payload.id);
 
     if (updateError) {
@@ -257,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const { error: updateError } = await supabaseClient
       .from("reservations")
-      .update({ status: "cancelled" })
+      .update({ status: "cancelled", confirmed_by: sessionData.session.user.id, confirmed_at: new Date().toISOString() })
       .eq("id", payload.id);
 
     if (updateError) {
