@@ -395,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const { P, n, slotTop, bounds, ballR, pegR, pegs, floorY } = BOARD;
     const gravity = 0.13, restitution = 0.66, wallRest = 0.5, jitterAmt = 1.3;
     const maxV = ballR * 0.62, SUB = 3;
+    const SPEED = 0.6; // globaler Tempo-Regler (kleiner = langsamer)
 
     const ball = {
       x: W / 2 + (Math.random() - 0.5) * (bounds[n] - bounds[0]) * 0.12,
@@ -429,7 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ball.vx *= 0.999;
       ball.vx = clamp(ball.vx, -maxV, maxV);
       ball.vy = clamp(ball.vy, -maxV, maxV);
-      ball.x += ball.vx; ball.y += ball.vy;
+      ball.x += ball.vx * SPEED; ball.y += ball.vy * SPEED;
       if (ball.x < P + ballR) { ball.x = P + ballR; ball.vx = Math.abs(ball.vx) * wallRest; }
       if (ball.x > W - P - ballR) { ball.x = W - P - ballR; ball.vx = -Math.abs(ball.vx) * wallRest; }
       collidePegs();
