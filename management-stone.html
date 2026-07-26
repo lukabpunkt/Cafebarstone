@@ -174,6 +174,22 @@
                   <input type="text" id="plinko-shot-desc" maxlength="80" placeholder="z. B. mit Salz & Zitrone" />
                 </div>
               </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="plinko-shot-weight">Häufigkeit</label>
+                  <input type="number" id="plinko-shot-weight" min="1" max="20" step="1" value="1" />
+                  <span class="field-hint">Höher = kommt öfter dran (breiterer Slot).</span>
+                </div>
+                <div class="form-field">
+                  <label for="plinko-shot-effect">Effekt</label>
+                  <div class="select-wrapper">
+                    <select id="plinko-shot-effect">
+                      <option value="normal">Normal</option>
+                      <option value="double">Doppelter Shot (×2)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
               <button type="submit" class="btn btn-primary">Shot hinzufügen</button>
             </form>
 

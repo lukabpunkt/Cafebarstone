@@ -68,6 +68,10 @@
               <span class="plinko-hint">
                 Mindestens 1 Spieler, maximal 10. Namen dürfen mehrfach vorkommen.
               </span>
+              <label class="plinko-toggle">
+                <input type="checkbox" id="plinko-bet-toggle" />
+                <span>🎯 Vorhersage-Wette – jeder tippt vor dem Wurf auf einen Shot</span>
+              </label>
               <p id="plinko-setup-error" class="plinko-error" aria-live="polite"></p>
               <button type="button" id="plinko-start" class="btn btn-primary plinko-start-btn">
                 Los geht's 🎉
@@ -81,6 +85,11 @@
               <span class="plinko-turn-eyebrow">Am Zug</span>
               <p id="plinko-current-player" class="plinko-turn-name">—</p>
               <p id="plinko-progress" class="plinko-progress"></p>
+            </div>
+
+            <div id="plinko-tip" class="plinko-tip is-hidden">
+              <p class="plinko-tip-label"><span id="plinko-tip-name">Spieler</span>, tippe deinen Shot:</p>
+              <div id="plinko-tip-chips" class="plinko-tip-chips"></div>
             </div>
 
             <div class="plinko-board-wrap">
@@ -106,6 +115,9 @@
             </div>
             <ul id="plinko-results-list" class="plinko-results-list"></ul>
             <div class="plinko-results-actions">
+              <button type="button" id="plinko-share" class="btn btn-outline plinko-share-btn">
+                Als Story teilen 📲
+              </button>
               <button type="button" id="plinko-restart" class="btn btn-primary plinko-start-btn">
                 Nochmal spielen
               </button>
@@ -150,10 +162,23 @@
           🎉 <span id="celebration-player">Spieler</span> trinkt
         </p>
         <p id="celebration-shot" class="plinko-celebration-shot">—</p>
+        <p id="celebration-tags" class="plinko-celebration-tags"></p>
         <p id="celebration-desc" class="plinko-celebration-desc"></p>
         <button type="button" id="plinko-next" class="btn btn-primary plinko-celebration-btn">
           Nächster Spieler
         </button>
+      </div>
+    </div>
+
+    <!-- ===== Teilen-Vorschau (Fallback wenn native Teilen nicht geht) ===== -->
+    <div id="plinko-share-preview" class="plinko-share-preview is-hidden" aria-hidden="true">
+      <div class="plinko-share-inner">
+        <img id="plinko-share-img" class="plinko-share-img" alt="Plinko-Ergebnis Café Bar Stone" />
+        <p class="plinko-share-hint">Bild lange gedrückt halten zum Speichern – oder herunterladen:</p>
+        <div class="plinko-share-preview-actions">
+          <a id="plinko-share-download" class="btn btn-primary" download="plinko-cafebarstone.png">Herunterladen</a>
+          <button type="button" id="plinko-share-close" class="btn btn-outline">Schließen</button>
+        </div>
       </div>
     </div>
 

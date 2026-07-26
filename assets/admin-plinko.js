@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameInput = document.getElementById("plinko-shot-name");
   const descInput = document.getElementById("plinko-shot-desc");
   const colorInput = document.getElementById("plinko-shot-color");
+  const weightInput = document.getElementById("plinko-shot-weight");
+  const effectInput = document.getElementById("plinko-shot-effect");
   const listEl = document.getElementById("plinko-shots-list");
   const messageEl = document.getElementById("plinko-admin-message");
   const enabledToggle = document.getElementById("plinko-enabled-toggle");
@@ -100,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setMessage("Lade Shots …");
     const { data, error } = await supabaseClient
       .from("plinko_shots")
-      .select("id, name, description, color, active, sort_order")
+      .select("id, name, description, color, active, sort_order, weight, effect")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
 
@@ -121,12 +123,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const color = s.color || "#c99b4b";
       const desc = s.description ? escapeHtml(s.description) : "";
       const inactive = s.active === false;
+      const weight = s.weight && Number(s.weight) > 0 ? Number(s.weight) : 1;
+      const dbl = s.effect === "double";
+      const meta = `Gewicht ${weight}${dbl ? " · ×2 Doppel" : ""}`;
       return `
         <div class="plinko-shot-item${inactive ? " is-inactive" : ""}">
           <span class="plinko-shot-swatch" style="background:${escapeHtml(color)}"></span>
           <span class="plinko-shot-info">
-            <span class="plinko-shot-name">${escapeHtml(s.name)}</span>
+            <span class="plinko-shot-name">${escapeHtml(s.name)}${dbl ? ' <span class="plinko-shot-badge">×2</span>' : ""}</span>
             ${desc ? `<span class="plinko-shot-desc">${desc}</span>` : ""}
+            <span class="plinko-shot-meta">${meta}</span>
           </span>
           <span class="plinko-shot-actions">
             <button type="button" class="admin-btn plinko-shot-toggle" data-id="${s.id}" data-active="${s.active !== false}">
@@ -149,6 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const name = nameInput instanceof HTMLInputElement ? nameInput.value.trim() : "";
       const description = descInput instanceof HTMLInputElement ? descInput.value.trim() : "";
       const color = colorInput instanceof HTMLInputElement ? colorInput.value : null;
+      let weight = weightInput instanceof HTMLInputElement ? Number(weightInput.value) : 1;
+      if (!Number.isFinite(weight) || weight < 1) weight = 1;
+      const effect = effectInput && effectInput.value === "double" ? "double" : "normal";
 
       if (!name) {
         setMessage("Bitte einen Namen für den Shot eingeben.");
@@ -173,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const { error } = await supabaseClient
         .from("plinko_shots")
-        .insert([{ name, description: description || null, color: color || null, active: true, sort_order: nextOrder }]);
+        .insert([{ name, description: description || null, color: color || null, active: true, sort_order: nextOrder, weight, effect }]);
 
       if (error) {
         console.error(error);
@@ -183,6 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (nameInput) nameInput.value = "";
       if (descInput) descInput.value = "";
+      if (weightInput) weightInput.value = "1";
+      if (effectInput) effectInput.value = "normal";
       setMessage("Shot hinzugefügt.");
       loadShots();
     });

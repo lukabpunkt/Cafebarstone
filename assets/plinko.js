@@ -3,11 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  // ---- Hamburger-Nav (identisch zur Startseite) ----
+  // ---- Hamburger-Nav ----
   const hamburgerBtn = document.getElementById("hamburger-btn");
   const navMenu = document.getElementById("nav-menu");
   const navBackdrop = document.getElementById("nav-backdrop");
-
   function toggleNav() {
     const isOpen = navMenu.classList.toggle("is-open");
     hamburgerBtn.classList.toggle("is-open", isOpen);
@@ -43,45 +42,66 @@ document.addEventListener("DOMContentLoaded", () => {
   const addPlayerBtn = document.getElementById("plinko-add-player");
   const startBtn = document.getElementById("plinko-start");
   const setupError = document.getElementById("plinko-setup-error");
+  const betToggle = document.getElementById("plinko-bet-toggle");
 
   const currentPlayerEl = document.getElementById("plinko-current-player");
   const progressEl = document.getElementById("plinko-progress");
   const dropBtn = document.getElementById("plinko-drop");
   const legendEl = document.getElementById("plinko-legend");
 
+  const tipBar = document.getElementById("plinko-tip");
+  const tipNameEl = document.getElementById("plinko-tip-name");
+  const tipChipsEl = document.getElementById("plinko-tip-chips");
+
   const celebration = document.getElementById("plinko-celebration");
   const celPlayerEl = document.getElementById("celebration-player");
   const celShotEl = document.getElementById("celebration-shot");
+  const celTagsEl = document.getElementById("celebration-tags");
   const celDescEl = document.getElementById("celebration-desc");
   const nextBtn = document.getElementById("plinko-next");
   const confettiCanvas = document.getElementById("plinko-confetti");
 
   const resultsList = document.getElementById("plinko-results-list");
   const restartBtn = document.getElementById("plinko-restart");
+  const shareBtn = document.getElementById("plinko-share");
+  const sharePreview = document.getElementById("plinko-share-preview");
+  const shareImg = document.getElementById("plinko-share-img");
+  const shareDownload = document.getElementById("plinko-share-download");
+  const shareClose = document.getElementById("plinko-share-close");
 
   const canvas = document.getElementById("plinko-canvas");
   const ctx = canvas.getContext("2d");
 
   const MAX_PLAYERS = 10;
+  const GAME_URL = "lukabpunkt.github.io/Cafebarstone/plinko.html";
   const reducedMotion = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const canVibrate = typeof navigator !== "undefined" && "vibrate" in navigator;
 
-  // Akzent-nahe Palette für Shots ohne eigene Farbe
   const PALETTE = [
     "#c99b4b", "#e0b46e", "#b5813a", "#d98c5f",
     "#8f9b57", "#6f9bb5", "#b56f8f", "#7f6fb5",
     "#5fae8c", "#cf6d6d", "#c9b44b", "#9b7bd1",
   ];
 
+  // Stone-Logo für Board-Wasserzeichen + Story-Karte
+  let logoImg = null, logoReady = false;
+  (function () {
+    const im = new Image();
+    im.onload = () => { logoImg = im; logoReady = true; };
+    im.src = "assets/Stonelogo.png";
+  })();
+
   // ============================================================
   //  State
   // ============================================================
-  let shots = [];        // [{name, description, color}]
+  let shots = [];        // [{name, description, color, weight, effect}]
   let players = [];      // [{name, shotIndex}]
   let currentIndex = 0;
   let animating = false;
   let celebrationVisible = false;
+  let betMode = false;
+  let predictedSlot = null;
 
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
@@ -92,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return PALETTE[i % PALETTE.length];
   }
+  const isDouble = (i) => shots[i] && shots[i].effect === "double";
 
   function readToken(name, fallback) {
     const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -130,10 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const row = document.createElement("div");
     row.className = "plinko-player-row";
-
     const idx = document.createElement("span");
     idx.className = "plinko-player-index";
-
     const input = document.createElement("input");
     input.type = "text";
     input.maxLength = 24;
@@ -149,17 +168,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (last) last.focus();
       }
     });
-
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "plinko-remove-btn";
     removeBtn.setAttribute("aria-label", "Spieler entfernen");
     removeBtn.textContent = "×";
-    removeBtn.addEventListener("click", () => {
-      row.remove();
-      renumberPlayerRows();
-    });
-
+    removeBtn.addEventListener("click", () => { row.remove(); renumberPlayerRows(); });
     row.append(idx, input, removeBtn);
     playersWrap.appendChild(row);
     renumberPlayerRows();
@@ -180,19 +194,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function collectPlayerNames() {
     if (!playersWrap) return [];
     return [...playersWrap.querySelectorAll("input")]
-      .map((el, i) => {
-        const v = el.value.trim();
-        return v || `Spieler ${i + 1}`;
-      });
+      .map((el, i) => { const v = el.value.trim(); return v || `Spieler ${i + 1}`; });
   }
 
   // ============================================================
-  //  Canvas-Geometrie & Board-Aufbau
+  //  Canvas-Geometrie & Board (gewichtete Slots)
   // ============================================================
   const TOP_PAD = 46;
   const SLOT_H = 58;
   let W = 460, H = 620;
-  let BOARD = null; // {P, n, slotW, slotTop, ballR, pegR, pegs, floorY}
+  let BOARD = null;
 
   function fitCanvas() {
     const wrap = canvas.parentElement;
@@ -201,8 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let cssH = Math.round(Math.min(cssW * 1.34, availH * 0.6));
     cssH = Math.max(cssH, Math.round(cssW * 1.08));
     const dpr = window.devicePixelRatio || 1;
-    W = cssW;
-    H = cssH;
+    W = cssW; H = cssH;
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
     canvas.style.width = cssW + "px";
@@ -216,19 +226,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const n = Math.max(1, shots.length);
     const fieldW = W - 2 * P;
     const slotTop = H - SLOT_H;
-    const slotW = fieldW / n;
-    const ballR = clamp(W * 0.028, 7, slotW * 0.36);
+
+    // Gewichtete Slot-Breiten
+    const weights = shots.map((s) => (s.weight && s.weight > 0 ? Number(s.weight) : 1));
+    while (weights.length < n) weights.push(1);
+    let widths = normalizeWidths(weights, fieldW, n);
+
+    // kumulative Grenzen
+    const bounds = [P];
+    for (let i = 0; i < n; i++) bounds.push(bounds[i] + widths[i]);
+    bounds[n] = W - P;
+
+    const minActual = Math.min(...widths);
+    const ballR = clamp(Math.min(W * 0.028, minActual * 0.36), 5, 22);
     const pegR = Math.max(3, W * 0.0095);
 
-    // Dichtes, versetztes Pin-Raster (mehr Hindernisse => mehr Bounces)
+    // Dichtes, versetztes Pin-Raster
     const pegSpacingX = Math.max(ballR * 3.8, fieldW / 8);
-    let cols = Math.max(2, Math.floor(fieldW / pegSpacingX));
+    const cols = Math.max(2, Math.floor(fieldW / pegSpacingX));
     const actualSpacing = fieldW / cols;
     const rowSpacingY = Math.max(ballR * 3.0, actualSpacing * 0.82);
     const topY = TOP_PAD + rowSpacingY * 0.7;
     const usableH = slotTop - topY - rowSpacingY * 0.5;
-    let R = Math.floor(usableH / rowSpacingY);
-    R = clamp(R, 7, 14);
+    let R = clamp(Math.floor(usableH / rowSpacingY), 7, 14);
 
     const pegs = [];
     for (let r = 0; r < R; r++) {
@@ -240,15 +260,37 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    BOARD = {
-      P, n, slotW, slotTop, ballR, pegR, pegs,
-      floorY: H - 8 - ballR,
-    };
+    BOARD = { P, n, slotTop, bounds, widths, ballR, pegR, pegs, floorY: H - 8 - ballR };
   }
 
-  function slotCenterX(i) {
-    return BOARD.P + BOARD.slotW * (i + 0.5);
+  // Verteilt fieldW nach Gewichten, erzwingt aber Mindestbreite je Slot
+  function normalizeWidths(weights, fieldW, n) {
+    const ballRguess = clamp(fieldW / n * 0.5, 6.5, 40);
+    let minSlot = Math.max(ballRguess * 1.6, fieldW * 0.055);
+    if (n * minSlot > fieldW) minSlot = fieldW / n; // physisch unmöglich -> uniform
+    const total = weights.reduce((a, b) => a + b, 0) || n;
+    let widths = weights.map((w) => fieldW * (w / total));
+    for (let iter = 0; iter < 24; iter++) {
+      const fixed = widths.map((w) => w < minSlot - 0.01);
+      if (!fixed.some(Boolean)) break;
+      const fixedCount = fixed.filter(Boolean).length;
+      const remain = fieldW - fixedCount * minSlot;
+      const othW = weights.reduce((a, w, i) => (fixed[i] ? a : a + w), 0) || 1;
+      widths = weights.map((w, i) => (fixed[i] ? minSlot : Math.max(minSlot, remain * (w / othW))));
+    }
+    // Rundungs-Korrektur auf exakt fieldW
+    const sum = widths.reduce((a, b) => a + b, 0);
+    const k = fieldW / sum;
+    return widths.map((w) => w * k);
   }
+
+  function slotIndexAtX(x) {
+    const b = BOARD.bounds;
+    const xc = clamp(x, b[0], b[BOARD.n]);
+    for (let i = 0; i < BOARD.n; i++) if (xc < b[i + 1]) return i;
+    return BOARD.n - 1;
+  }
+  function slotCenterX(i) { return (BOARD.bounds[i] + BOARD.bounds[i + 1]) / 2; }
 
   // ============================================================
   //  Zeichnen
@@ -256,55 +298,64 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawBoard(ball, highlightSlot, nearSlot, nearIntensity) {
     if (!BOARD) return;
     ctx.clearRect(0, 0, W, H);
-    const { P, n, slotW, slotTop, ballR, pegR, pegs } = BOARD;
+    const { P, n, slotTop, bounds, ballR, pegR, pegs } = BOARD;
 
-    // Slots (unten)
+    // Logo-Wasserzeichen (Branding)
+    if (logoReady) {
+      const lw = W * 0.52;
+      const lh = lw * (logoImg.height / logoImg.width);
+      ctx.save();
+      ctx.globalAlpha = 0.05;
+      ctx.drawImage(logoImg, (W - lw) / 2, (slotTop - lh) / 2 + 10, lw, lh);
+      ctx.restore();
+    }
+
+    // Slots
     for (let i = 0; i < n; i++) {
-      const x = P + slotW * i;
+      const x = bounds[i], w = bounds[i + 1] - bounds[i];
       const col = shotColor(i);
       let intensity = 0.16;
       if (i === highlightSlot) intensity = 0.5;
       else if (i === nearSlot) intensity = 0.16 + 0.3 * (nearIntensity || 0);
       ctx.fillStyle = hexToRgba(col, intensity);
-      ctx.fillRect(x, slotTop, slotW, SLOT_H);
+      ctx.fillRect(x, slotTop, w, SLOT_H);
       ctx.fillStyle = hexToRgba(col, i === highlightSlot ? 1 : 0.85);
-      ctx.fillRect(x + 2, H - 6, slotW - 4, 4);
+      ctx.fillRect(x + 2, H - 6, w - 4, 4);
       ctx.strokeStyle = "rgba(255,255,255,0.10)";
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x, slotTop);
-      ctx.lineTo(x, H);
-      ctx.stroke();
-      ctx.fillStyle = i === highlightSlot ? COL_TEXT : COL_TEXT_SOFT;
-      ctx.font = "600 13px -apple-system, system-ui, sans-serif";
+      ctx.beginPath(); ctx.moveTo(x, slotTop); ctx.lineTo(x, H); ctx.stroke();
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(String(i + 1), x + slotW / 2, slotTop + SLOT_H / 2);
+      ctx.fillStyle = i === highlightSlot ? COL_TEXT : COL_TEXT_SOFT;
+      if (isDouble(i)) {
+        ctx.font = "600 12px -apple-system, system-ui, sans-serif";
+        ctx.fillText(String(i + 1), x + w / 2, slotTop + SLOT_H / 2 - 8);
+        ctx.font = "700 12px -apple-system, system-ui, sans-serif";
+        ctx.fillStyle = hexToRgba(col, 1);
+        ctx.fillText("×2", x + w / 2, slotTop + SLOT_H / 2 + 9);
+      } else {
+        ctx.font = "600 13px -apple-system, system-ui, sans-serif";
+        ctx.fillText(String(i + 1), x + w / 2, slotTop + SLOT_H / 2);
+      }
     }
     ctx.strokeStyle = "rgba(255,255,255,0.10)";
-    ctx.beginPath();
-    ctx.moveTo(P, slotTop);
-    ctx.lineTo(W - P, slotTop);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(P, slotTop); ctx.lineTo(W - P, slotTop); ctx.stroke();
 
-    // Pegs (mit Flash bei Treffer)
+    // Pegs
     for (const p of pegs) {
       const f = p.flash > 0 ? p.flash / 6 : 0;
       if (p.flash > 0) p.flash--;
       const rr = pegR + f * 2.2;
       if (f > 0) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, rr + 3, 0, Math.PI * 2);
-        ctx.fillStyle = hexToRgba("#ffe9c2", 0.25 * f);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, p.y, rr + 3, 0, Math.PI * 2);
+        ctx.fillStyle = hexToRgba("#ffe9c2", 0.25 * f); ctx.fill();
       }
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
       ctx.fillStyle = f > 0 ? hexToRgba("#ffe9c2", 0.9) : hexToRgba(COL_ACCENT, 0.55);
       ctx.fill();
     }
 
-    // Ball (mit Trail + Squash)
+    // Ball
     if (ball) {
       if (ball.trail && ball.trail.length) {
         for (let t = 0; t < ball.trail.length; t++) {
@@ -312,8 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const a = ((t + 1) / ball.trail.length) * 0.35;
           ctx.beginPath();
           ctx.arc(tp.x, tp.y, ballR * (0.5 + 0.5 * (t + 1) / ball.trail.length), 0, Math.PI * 2);
-          ctx.fillStyle = hexToRgba(COL_ACCENT, a);
-          ctx.fill();
+          ctx.fillStyle = hexToRgba(COL_ACCENT, a); ctx.fill();
         }
       }
       const speed = Math.hypot(ball.vx || 0, ball.vy || 0);
@@ -327,8 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const grad = ctx.createRadialGradient(-ballR * 0.3, -ballR * 0.3, ballR * 0.2, 0, 0, ballR);
       grad.addColorStop(0, "#fff4de");
       grad.addColorStop(1, COL_ACCENT);
-      ctx.beginPath();
-      ctx.arc(0, 0, ballR, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(0, 0, ballR, 0, Math.PI * 2);
       ctx.fillStyle = grad;
       ctx.shadowColor = "rgba(201,155,75,0.7)";
       ctx.shadowBlur = 14 + Math.min(10, speed);
@@ -339,113 +388,79 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================
-  //  Physik-Simulation (echte Kollisionen, natürliche Verteilung)
+  //  Physik-Simulation
   // ============================================================
   function dropBall(onDone) {
-    const { P, n, slotW, slotTop, ballR, pegR, pegs, floorY } = BOARD;
-    const gravity = 0.20;
-    const restitution = 0.66;
-    const wallRest = 0.5;
-    const jitterAmt = 1.3;
-    const maxV = ballR * 0.8;
-    const SUB = 3;
+    const { P, n, slotTop, bounds, ballR, pegR, pegs, floorY } = BOARD;
+    const gravity = 0.20, restitution = 0.66, wallRest = 0.5, jitterAmt = 1.3;
+    const maxV = ballR * 0.8, SUB = 3;
 
     const ball = {
-      x: W / 2 + (Math.random() - 0.5) * slotW * 0.5,
+      x: W / 2 + (Math.random() - 0.5) * (bounds[n] - bounds[0]) * 0.12,
       y: TOP_PAD - 6,
       vx: (Math.random() - 0.5) * 1.6,
-      vy: 0.6,
-      trail: [],
-      hit: 0,
+      vy: 0.6, trail: [], hit: 0,
     };
-
-    let stable = 0;
-    let frames = 0;
-    let lastTick = 0;
+    let stable = 0, frames = 0, lastTick = 0;
 
     function hapticTick() {
       if (reducedMotion || !canVibrate) return;
-      frames - lastTick > 3 && (navigator.vibrate(5), lastTick = frames);
+      if (frames - lastTick > 3) { navigator.vibrate(5); lastTick = frames; }
     }
-
     function collidePegs() {
       for (const p of pegs) {
-        const dx = ball.x - p.x, dy = ball.y - p.y;
-        const minD = ballR + pegR;
+        const dx = ball.x - p.x, dy = ball.y - p.y, minD = ballR + pegR;
         const d2 = dx * dx + dy * dy;
         if (d2 < minD * minD) {
-          const d = Math.sqrt(d2) || 0.0001;
-          const nx = dx / d, ny = dy / d;
-          ball.x = p.x + nx * minD;
-          ball.y = p.y + ny * minD;
+          const d = Math.sqrt(d2) || 0.0001, nx = dx / d, ny = dy / d;
+          ball.x = p.x + nx * minD; ball.y = p.y + ny * minD;
           const vdot = ball.vx * nx + ball.vy * ny;
           ball.vx -= (1 + restitution) * vdot * nx;
           ball.vy -= (1 + restitution) * vdot * ny;
           const jitter = (Math.random() - 0.5) * jitterAmt;
-          ball.vx += -ny * jitter;
-          ball.vy += nx * jitter;
-          p.flash = 6;
-          ball.hit = 6;
-          hapticTick();
+          ball.vx += -ny * jitter; ball.vy += nx * jitter;
+          p.flash = 6; ball.hit = 6; hapticTick();
         }
       }
     }
-
     function substep() {
       ball.vy += gravity / SUB;
       ball.vx *= 0.999;
       ball.vx = clamp(ball.vx, -maxV, maxV);
       ball.vy = clamp(ball.vy, -maxV, maxV);
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-
-      // Seitenwände
+      ball.x += ball.vx; ball.y += ball.vy;
       if (ball.x < P + ballR) { ball.x = P + ballR; ball.vx = Math.abs(ball.vx) * wallRest; }
       if (ball.x > W - P - ballR) { ball.x = W - P - ballR; ball.vx = -Math.abs(ball.vx) * wallRest; }
-
       collidePegs();
-
-      // Slot-Bereich: in Rinne führen + Boden
       if (ball.y > slotTop - ballR) {
-        const col = clamp(Math.floor((ball.x - P) / slotW), 0, n - 1);
-        const leftX = P + col * slotW + ballR;
-        const rightX = P + (col + 1) * slotW - ballR;
+        const col = slotIndexAtX(ball.x);
+        const leftX = bounds[col] + ballR, rightX = bounds[col + 1] - ballR;
         if (ball.x < leftX) { ball.x = leftX; ball.vx = Math.abs(ball.vx) * 0.4; }
         if (ball.x > rightX) { ball.x = rightX; ball.vx = -Math.abs(ball.vx) * 0.4; }
-        if (ball.y > floorY) {
-          ball.y = floorY;
-          ball.vy = -Math.abs(ball.vy) * 0.34;
-          ball.vx *= 0.6;
-        }
+        if (ball.y > floorY) { ball.y = floorY; ball.vy = -Math.abs(ball.vy) * 0.34; ball.vx *= 0.6; }
       }
     }
-
     function frame() {
       frames++;
       for (let s = 0; s < SUB; s++) substep();
-
-      // Trail pflegen
       ball.trail.push({ x: ball.x, y: ball.y });
       if (ball.trail.length > (reducedMotion ? 0 : 8)) ball.trail.shift();
 
-      // Nähe zum Ziel-Slot für Puls
       let nearSlot = -1, nearIntensity = 0;
-      if (ball.y > slotTop - BOARD.slotW) {
-        nearSlot = clamp(Math.floor((ball.x - P) / slotW), 0, n - 1);
-        nearIntensity = clamp((ball.y - (slotTop - BOARD.slotW)) / BOARD.slotW, 0, 1);
+      const slotW0 = bounds[1] - bounds[0];
+      if (ball.y > slotTop - slotW0) {
+        nearSlot = slotIndexAtX(ball.x);
+        nearIntensity = clamp((ball.y - (slotTop - slotW0)) / slotW0, 0, 1);
       }
       drawBoard(ball, -1, nearSlot, nearIntensity);
 
-      // Ruhelage prüfen
       const slow = Math.abs(ball.vx) < 0.5 && Math.abs(ball.vy) < 0.9;
       if (ball.y > slotTop && slow) stable++; else stable = 0;
 
       if (stable > 9 || frames > 60 * 9) {
-        const result = clamp(Math.floor((ball.x - P) / slotW), 0, n - 1);
-        // kurzer Einschlag-Shake
+        const result = slotIndexAtX(ball.x);
         if (!reducedMotion) {
-          canvas.classList.remove("is-shaking");
-          void canvas.offsetWidth;
+          canvas.classList.remove("is-shaking"); void canvas.offsetWidth;
           canvas.classList.add("is-shaking");
         }
         drawBoard(ball, result, -1, 0);
@@ -458,10 +473,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================
-  //  Konfetti (Feier)
+  //  Konfetti
   // ============================================================
   let confettiRAF = null;
-  function startConfetti(color) {
+  function startConfetti(color, boost) {
     if (!confettiCanvas) return;
     const cx = confettiCanvas.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
@@ -469,27 +484,19 @@ document.addEventListener("DOMContentLoaded", () => {
     confettiCanvas.width = Math.round(w * dpr);
     confettiCanvas.height = Math.round(h * dpr);
     cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
     const cols = [color, "#e0b46e", "#c99b4b", "#ffffff", "#ffe9c2"];
-    const N = reducedMotion ? 36 : 150;
+    const N = Math.round((reducedMotion ? 36 : 150) * (boost || 1));
     const parts = [];
     for (let i = 0; i < N; i++) {
       parts.push({
         x: w / 2 + (Math.random() - 0.5) * w * 0.35,
         y: h * 0.42 + (Math.random() - 0.5) * 60,
-        vx: (Math.random() - 0.5) * 11,
-        vy: -7 - Math.random() * 10,
-        g: 0.22 + Math.random() * 0.14,
-        rot: Math.random() * 6.28,
-        vr: (Math.random() - 0.5) * 0.4,
-        w: 6 + Math.random() * 7,
-        h: 9 + Math.random() * 10,
-        col: cols[i % cols.length],
-        life: 0,
-        ttl: 90 + Math.random() * 70,
+        vx: (Math.random() - 0.5) * 11, vy: -7 - Math.random() * 10,
+        g: 0.22 + Math.random() * 0.14, rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4,
+        w: 6 + Math.random() * 7, h: 9 + Math.random() * 10,
+        col: cols[i % cols.length], life: 0, ttl: 90 + Math.random() * 70,
       });
     }
-
     cancelAnimationFrame(confettiRAF);
     function loop() {
       cx.clearRect(0, 0, w, h);
@@ -497,26 +504,13 @@ document.addEventListener("DOMContentLoaded", () => {
       for (const p of parts) {
         if (p.life > p.ttl) continue;
         alive = true;
-        p.vy += p.g;
-        p.vx *= 0.99;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        p.life++;
+        p.vy += p.g; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
         const fade = p.life > p.ttl - 25 ? Math.max(0, (p.ttl - p.life) / 25) : 1;
-        cx.save();
-        cx.translate(p.x, p.y);
-        cx.rotate(p.rot);
-        cx.globalAlpha = fade;
-        cx.fillStyle = p.col;
-        cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-        cx.restore();
+        cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.globalAlpha = fade;
+        cx.fillStyle = p.col; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cx.restore();
       }
-      if (alive && celebrationVisible) {
-        confettiRAF = requestAnimationFrame(loop);
-      } else {
-        cx.clearRect(0, 0, w, h);
-      }
+      if (alive && celebrationVisible) confettiRAF = requestAnimationFrame(loop);
+      else cx.clearRect(0, 0, w, h);
     }
     loop();
   }
@@ -528,7 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================
-  //  Legende
+  //  Legende + Tipp-Chips (Wette)
   // ============================================================
   function renderLegend() {
     if (!legendEl) return;
@@ -540,9 +534,34 @@ document.addEventListener("DOMContentLoaded", () => {
       sw.className = "plinko-legend-swatch";
       sw.style.background = shotColor(i);
       const label = document.createElement("span");
-      label.textContent = `${i + 1}. ${s.name}`;
+      label.textContent = `${i + 1}. ${s.name}${isDouble(i) ? " ×2" : ""}`;
       item.append(sw, label);
       legendEl.appendChild(item);
+    });
+  }
+
+  function renderTipChips() {
+    if (!tipChipsEl) return;
+    tipChipsEl.innerHTML = "";
+    shots.forEach((s, i) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "plinko-tip-chip";
+      chip.dataset.idx = String(i);
+      const sw = document.createElement("span");
+      sw.className = "plinko-legend-swatch";
+      sw.style.background = shotColor(i);
+      const label = document.createElement("span");
+      label.textContent = s.name + (isDouble(i) ? " ×2" : "");
+      chip.append(sw, label);
+      chip.addEventListener("click", () => {
+        predictedSlot = i;
+        tipChipsEl.querySelectorAll(".plinko-tip-chip").forEach((c) => c.classList.remove("is-selected"));
+        chip.classList.add("is-selected");
+        if (dropBtn) dropBtn.disabled = false;
+        vibrate(8);
+      });
+      tipChipsEl.appendChild(chip);
     });
   }
 
@@ -552,19 +571,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function startGame() {
     if (!setupError) return;
     setupError.textContent = "";
-
     if (shots.length === 0) {
-      setupError.textContent =
-        "Aktuell sind keine Shots konfiguriert. Bitte sprich das Bar-Team an.";
+      setupError.textContent = "Aktuell sind keine Shots konfiguriert. Bitte sprich das Bar-Team an.";
       return;
     }
     const names = collectPlayerNames();
-    if (names.length === 0) {
-      setupError.textContent = "Bitte mindestens einen Spieler eintragen.";
-      return;
-    }
+    if (names.length === 0) { setupError.textContent = "Bitte mindestens einen Spieler eintragen."; return; }
 
-    players = names.map((name) => ({ name, shotIndex: null }));
+    betMode = !!(betToggle && betToggle.checked);
+    players = names.map((name) => ({ name, shotIndex: null, betCorrect: false }));
     currentIndex = 0;
 
     showScreen(gameScreen);
@@ -576,30 +591,42 @@ document.addEventListener("DOMContentLoaded", () => {
   function beginTurn() {
     animating = false;
     hideCelebration();
+    predictedSlot = null;
+
+    if (tipBar) {
+      if (betMode) {
+        tipBar.classList.remove("is-hidden");
+        if (tipNameEl) tipNameEl.textContent = players[currentIndex].name;
+        renderTipChips();
+      } else {
+        tipBar.classList.add("is-hidden");
+      }
+    }
     if (dropBtn) {
       dropBtn.style.display = "";
-      dropBtn.disabled = false;
+      dropBtn.disabled = betMode; // im Wett-Modus erst nach Tipp
     }
     const player = players[currentIndex];
     if (currentPlayerEl) {
       currentPlayerEl.textContent = player.name;
       currentPlayerEl.classList.add("is-pulsing");
     }
-    if (progressEl) {
-      progressEl.textContent = `Spieler ${currentIndex + 1} von ${players.length}`;
-    }
+    if (progressEl) progressEl.textContent = `Spieler ${currentIndex + 1} von ${players.length}`;
     fitCanvas();
     drawBoard(null, -1, -1, 0);
   }
 
   function onDrop() {
     if (animating) return;
+    if (betMode && predictedSlot === null) return;
     animating = true;
     if (dropBtn) dropBtn.disabled = true;
+    if (tipBar) tipBar.classList.add("is-hidden");
     if (currentPlayerEl) currentPlayerEl.classList.remove("is-pulsing");
     vibrate(12);
     dropBall((slot) => {
       players[currentIndex].shotIndex = slot;
+      players[currentIndex].betCorrect = betMode && predictedSlot === slot;
       setTimeout(() => showCelebration(slot), 260);
     });
   }
@@ -607,24 +634,41 @@ document.addEventListener("DOMContentLoaded", () => {
   function showCelebration(slot) {
     const shot = shots[slot];
     const color = shotColor(slot);
+    const dbl = isDouble(slot);
+    const betWon = players[currentIndex].betCorrect;
+
     if (celebration) celebration.style.setProperty("--cel-color", color);
     if (celPlayerEl) celPlayerEl.textContent = players[currentIndex].name;
-    if (celShotEl) celShotEl.textContent = shot.name;
+    if (celShotEl) celShotEl.textContent = dbl ? `${shot.name} ×2` : shot.name;
     if (celDescEl) {
       celDescEl.textContent = shot.description || "";
       celDescEl.style.display = shot.description ? "" : "none";
     }
+    if (celTagsEl) {
+      celTagsEl.innerHTML = "";
+      if (dbl) {
+        const t = document.createElement("span");
+        t.className = "plinko-cel-tag is-double";
+        t.textContent = "🥃 DOPPELTER SHOT!";
+        celTagsEl.appendChild(t);
+      }
+      if (betWon) {
+        const t = document.createElement("span");
+        t.className = "plinko-cel-tag is-bet";
+        t.textContent = "🎯 Richtig getippt – einer gibt dir aus!";
+        celTagsEl.appendChild(t);
+      }
+    }
     if (nextBtn) {
-      nextBtn.textContent =
-        currentIndex >= players.length - 1 ? "Ergebnis anzeigen 🎊" : "Nächster Spieler →";
+      nextBtn.textContent = currentIndex >= players.length - 1 ? "Ergebnis anzeigen 🎊" : "Nächster Spieler →";
     }
     celebrationVisible = true;
     if (celebration) {
       celebration.classList.remove("is-hidden");
       celebration.setAttribute("aria-hidden", "false");
     }
-    vibrate([0, 55, 45, 90, 45, 160]);
-    startConfetti(color);
+    vibrate(dbl || betWon ? [0, 70, 40, 70, 40, 90, 40, 180] : [0, 55, 45, 90, 45, 160]);
+    startConfetti(color, dbl || betWon ? 1.8 : 1);
     animating = false;
   }
 
@@ -639,35 +683,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function onNext() {
     hideCelebration();
-    if (currentIndex >= players.length - 1) {
-      showResults();
-    } else {
-      currentIndex++;
-      beginTurn();
-    }
+    if (currentIndex >= players.length - 1) showResults();
+    else { currentIndex++; beginTurn(); }
+  }
+
+  function resultLabel(p) {
+    const shot = shots[p.shotIndex];
+    if (!shot) return "—";
+    return isDouble(p.shotIndex) ? `${shot.name} ×2` : shot.name;
   }
 
   function showResults() {
     if (resultsList) {
       resultsList.innerHTML = "";
       players.forEach((p, idx) => {
-        const shot = shots[p.shotIndex];
         const li = document.createElement("li");
         li.style.animationDelay = (idx * 0.06) + "s";
-
         const nameEl = document.createElement("span");
         nameEl.className = "plinko-result-player";
         nameEl.textContent = p.name;
-
         const shotEl = document.createElement("span");
         shotEl.className = "plinko-result-shot";
         const sw = document.createElement("span");
         sw.className = "plinko-legend-swatch";
         sw.style.background = shotColor(p.shotIndex);
         const shotName = document.createElement("span");
-        shotName.textContent = shot ? shot.name : "—";
+        shotName.textContent = resultLabel(p);
         shotEl.append(sw, shotName);
-
         li.append(nameEl, shotEl);
         resultsList.appendChild(li);
       });
@@ -678,10 +720,128 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function restart() {
     hideCelebration();
+    hideSharePreview();
     players = [];
     currentIndex = 0;
     showScreen(setupScreen);
     if (setupError) setupError.textContent = "";
+  }
+
+  // ============================================================
+  //  Teilbare Story-Karte (1080×1920)
+  // ============================================================
+  function renderShareCard() {
+    const CW = 1080, CH = 1920;
+    const cv = document.createElement("canvas");
+    cv.width = CW; cv.height = CH;
+    const g = cv.getContext("2d");
+
+    // Hintergrund
+    g.fillStyle = "#07090c";
+    g.fillRect(0, 0, CW, CH);
+    const bg = g.createRadialGradient(CW / 2, CH * 0.32, 80, CW / 2, CH * 0.32, CH * 0.7);
+    bg.addColorStop(0, "rgba(201,155,75,0.18)");
+    bg.addColorStop(1, "rgba(2,2,4,0)");
+    g.fillStyle = bg; g.fillRect(0, 0, CW, CH);
+
+    // Logo
+    if (logoReady) {
+      const lw = 420, lh = lw * (logoImg.height / logoImg.width);
+      g.drawImage(logoImg, (CW - lw) / 2, 150, lw, lh);
+    } else {
+      g.fillStyle = "#f7f3ea";
+      g.font = "700 84px -apple-system, system-ui, sans-serif";
+      g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText("CAFÉ BAR STONE", CW / 2, 230);
+    }
+
+    // Titel
+    g.textAlign = "center";
+    g.fillStyle = "#c99b4b";
+    g.font = "700 40px -apple-system, system-ui, sans-serif";
+    g.fillText("PLINKO · SHOT-GAME", CW / 2, 470);
+    g.fillStyle = "#f7f3ea";
+    g.font = "800 76px -apple-system, system-ui, sans-serif";
+    g.fillText("Wer trinkt was? 🍻", CW / 2, 560);
+
+    // Liste
+    const n = players.length;
+    const listTop = 700, listBottom = 1680;
+    const rowH = Math.min(150, (listBottom - listTop) / Math.max(1, n));
+    const fs = clamp(rowH * 0.42, 30, 60);
+    players.forEach((p, i) => {
+      const y = listTop + rowH * i + rowH / 2;
+      const col = shotColor(p.shotIndex);
+      // Karte
+      g.fillStyle = "rgba(255,255,255,0.04)";
+      roundRect(g, 90, y - rowH * 0.42, CW - 180, rowH * 0.84, 24);
+      g.fill();
+      // Swatch
+      g.fillStyle = col;
+      roundRect(g, 130, y - fs * 0.5, fs, fs, 8); g.fill();
+      // Name
+      g.fillStyle = "#f7f3ea";
+      g.textAlign = "left";
+      g.font = `700 ${fs}px -apple-system, system-ui, sans-serif`;
+      g.fillText(clip(p.name, 16), 130 + fs + 28, y);
+      // Shot
+      g.fillStyle = col;
+      g.textAlign = "right";
+      g.font = `600 ${fs * 0.9}px -apple-system, system-ui, sans-serif`;
+      g.fillText(clip(resultLabel(p), 22), CW - 130, y);
+    });
+
+    // Footer
+    g.textAlign = "center";
+    g.fillStyle = "#c99b4b";
+    g.font = "600 40px -apple-system, system-ui, sans-serif";
+    g.fillText("@stonelingen", CW / 2, 1770);
+    g.fillStyle = "rgba(193,188,207,0.7)";
+    g.font = "400 32px -apple-system, system-ui, sans-serif";
+    g.fillText(GAME_URL, CW / 2, 1830);
+
+    return cv.toDataURL("image/png");
+  }
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+  function clip(s, max) { s = String(s); return s.length > max ? s.slice(0, max - 1) + "…" : s; }
+
+  async function shareResults() {
+    let dataUrl;
+    try { dataUrl = renderShareCard(); } catch (e) { console.error(e); return; }
+    try {
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "plinko-cafebarstone.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Café Bar Stone · Plinko",
+          text: "Wer trinkt was? 🍻 #cafebarstone",
+        });
+        return;
+      }
+    } catch (e) { /* abgebrochen oder nicht unterstützt -> Vorschau */ }
+    showSharePreview(dataUrl);
+  }
+
+  function showSharePreview(dataUrl) {
+    if (!sharePreview) return;
+    if (shareImg) shareImg.src = dataUrl;
+    if (shareDownload) shareDownload.href = dataUrl;
+    sharePreview.classList.remove("is-hidden");
+    sharePreview.setAttribute("aria-hidden", "false");
+  }
+  function hideSharePreview() {
+    if (!sharePreview) return;
+    sharePreview.classList.add("is-hidden");
+    sharePreview.setAttribute("aria-hidden", "true");
   }
 
   // ============================================================
@@ -690,27 +850,33 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadData() {
     try {
       const { data } = await supabaseClient
-        .from("business_settings")
-        .select("plinko_enabled")
-        .limit(1);
+        .from("business_settings").select("plinko_enabled").limit(1);
       if (data && data.length > 0 && data[0].plinko_enabled === false) {
         showDisabledMessage();
         return false;
       }
-    } catch (_) { /* Spalte evtl. nicht vorhanden – ignorieren */ }
-
-    try {
-      const { data, error } = await supabaseClient
+    } catch (_) {}
+    async function fetchShots(cols) {
+      return supabaseClient
         .from("plinko_shots")
-        .select("name, description, color, sort_order")
+        .select(cols)
         .eq("active", true)
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: true });
-      if (error) throw error;
+    }
+    try {
+      // Neue Spalten weight/effect – bei Fehler (Migration noch nicht da) Fallback
+      let { data, error } = await fetchShots("name, description, color, weight, effect, sort_order");
+      if (error) {
+        ({ data, error } = await fetchShots("name, description, color, sort_order"));
+        if (error) throw error;
+      }
       shots = (data || []).map((s) => ({
         name: s.name,
         description: s.description || "",
         color: s.color || null,
+        weight: s.weight && Number(s.weight) > 0 ? Number(s.weight) : 1,
+        effect: s.effect === "double" ? "double" : "normal",
       }));
     } catch (err) {
       console.error("plinko_shots:", err);
@@ -724,8 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setupScreen.innerHTML =
         '<div class="plinko-panel"><p class="eyebrow">Nicht verfügbar</p>' +
         '<p style="color:var(--color-text-soft);font-size:14px;line-height:1.7;margin-top:8px;">' +
-        "Das Plinko-Spiel ist gerade nicht verfügbar. Schau später wieder vorbei " +
-        "oder frag das Bar-Team.</p></div>";
+        "Das Plinko-Spiel ist gerade nicht verfügbar. Schau später wieder vorbei oder frag das Bar-Team.</p></div>";
     }
   }
 
@@ -737,6 +902,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dropBtn) dropBtn.addEventListener("click", onDrop);
   if (nextBtn) nextBtn.addEventListener("click", onNext);
   if (restartBtn) restartBtn.addEventListener("click", restart);
+  if (shareBtn) shareBtn.addEventListener("click", shareResults);
+  if (shareClose) shareClose.addEventListener("click", hideSharePreview);
+  if (sharePreview) sharePreview.addEventListener("click", (e) => { if (e.target === sharePreview) hideSharePreview(); });
 
   window.addEventListener("resize", () => {
     if (!gameScreen.classList.contains("is-hidden") && !animating && !celebrationVisible) {
@@ -745,7 +913,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Zwei Startfelder vorbelegen
   addPlayerRow("");
   addPlayerRow("");
 
