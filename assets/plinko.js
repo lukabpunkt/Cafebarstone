@@ -393,8 +393,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================================
   function dropBall(onDone) {
     const { P, n, slotTop, bounds, ballR, pegR, pegs, floorY } = BOARD;
-    const gravity = 0.20, restitution = 0.66, wallRest = 0.5, jitterAmt = 1.3;
-    const maxV = ballR * 0.8, SUB = 3;
+    const gravity = 0.13, restitution = 0.66, wallRest = 0.5, jitterAmt = 1.3;
+    const maxV = ballR * 0.62, SUB = 3;
 
     const ball = {
       x: W / 2 + (Math.random() - 0.5) * (bounds[n] - bounds[0]) * 0.12,
@@ -458,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const slow = Math.abs(ball.vx) < 0.5 && Math.abs(ball.vy) < 0.9;
       if (ball.y > slotTop && slow) stable++; else stable = 0;
 
-      if (stable > 9 || frames > 60 * 9) {
+      if (stable > 9 || frames > 60 * 15) {
         const result = slotIndexAtX(ball.x);
         if (!reducedMotion) {
           canvas.classList.remove("is-shaking"); void canvas.offsetWidth;
