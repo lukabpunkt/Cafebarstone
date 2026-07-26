@@ -1,0 +1,390 @@
+/* ============================================================
+   Plinko-Minigame – Café Bar Stone
+   Nutzt ausschließlich die Design-Tokens aus styles.css.
+   ============================================================ */
+
+.plinko-section {
+  padding: 24px 0 50px;
+}
+
+.plinko-intro {
+  max-width: 620px;
+  margin-bottom: 22px;
+}
+
+.plinko-intro h1 {
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 10px 0 12px;
+}
+
+.plinko-intro p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-text-soft);
+}
+
+.plinko-panel {
+  background: var(--color-bg-elevated-soft);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: 22px 22px 24px;
+  box-shadow: var(--shadow-soft);
+}
+
+/* --- Screen-Umschaltung --- */
+.plinko-screen {
+  display: block;
+}
+
+.plinko-screen.is-hidden {
+  display: none !important;
+}
+
+/* --- Setup: Spielernamen --- */
+.plinko-players {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0 14px;
+}
+
+.plinko-player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.plinko-player-row .plinko-player-index {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 155, 75, 0.5);
+  color: var(--color-accent);
+  font-size: 12px;
+}
+
+.plinko-player-row input {
+  flex: 1 1 auto;
+}
+
+.plinko-remove-btn {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.08);
+  color: #ff6b6b;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.plinko-remove-btn:hover {
+  background: rgba(255, 107, 107, 0.18);
+  border-color: rgba(255, 107, 107, 0.6);
+}
+
+.plinko-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.plinko-hint {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(193, 188, 207, 0.75);
+}
+
+.plinko-error {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--color-error);
+  min-height: 1em;
+}
+
+/* --- Spiel: aktueller Spieler + Board --- */
+.plinko-turn-header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.plinko-turn-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 11px;
+  color: var(--color-accent);
+}
+
+.plinko-turn-name {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 4px 0 0;
+}
+
+.plinko-progress {
+  font-size: 12px;
+  color: var(--color-text-soft);
+  margin-top: 4px;
+}
+
+.plinko-board-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+#plinko-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-soft);
+  background: radial-gradient(circle at top, rgba(201, 155, 75, 0.08), transparent 60%),
+    rgba(6, 8, 12, 0.9);
+  touch-action: manipulation;
+}
+
+.plinko-play-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.plinko-play-actions .btn {
+  min-width: 220px;
+}
+
+/* --- Legende (Slot-Farbe -> Shot) --- */
+.plinko-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  justify-content: center;
+  margin: 16px auto 0;
+  max-width: 480px;
+}
+
+.plinko-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--color-text-soft);
+}
+
+.plinko-legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+/* --- Reveal-Karte --- */
+.plinko-reveal {
+  margin-top: 18px;
+  text-align: center;
+  padding: 18px 18px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(201, 155, 75, 0.45);
+  background: radial-gradient(circle at top, rgba(201, 155, 75, 0.18), transparent 60%),
+    rgba(10, 12, 17, 0.96);
+  box-shadow: var(--shadow-soft);
+}
+
+.plinko-reveal.is-hidden {
+  display: none !important;
+}
+
+.plinko-reveal-label {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  color: var(--color-accent);
+}
+
+.plinko-reveal-shot {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 6px 0 4px;
+  color: var(--color-text);
+}
+
+.plinko-reveal-desc {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  margin: 0 0 16px;
+}
+
+/* --- Ergebnis-Liste --- */
+.plinko-results-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.plinko-results-header h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 6px 0 4px;
+}
+
+.plinko-results-header p {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  margin: 0;
+}
+
+.plinko-results-list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plinko-results-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-soft);
+  background: rgba(8, 10, 15, 0.7);
+}
+
+.plinko-result-player {
+  font-weight: 600;
+  color: var(--color-text);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.plinko-result-shot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-accent);
+  font-size: 14px;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.plinko-result-shot .plinko-legend-swatch {
+  width: 14px;
+  height: 14px;
+}
+
+.plinko-results-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.plinko-disclaimer {
+  margin-top: 18px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(193, 188, 207, 0.65);
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .plinko-panel {
+    padding: 28px 32px 30px;
+  }
+}
+
+/* ============================================================
+   Admin-Dashboard: Shot-Verwaltung
+   ============================================================ */
+
+.plinko-admin-form {
+  margin: 4px 0 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.plinko-admin-form input[type="color"] {
+  padding: 2px;
+  height: 42px;
+  cursor: pointer;
+}
+
+.plinko-shots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plinko-admin-empty {
+  font-size: 13px;
+  color: var(--color-text-soft);
+  margin: 4px 0;
+}
+
+.plinko-shot-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-soft);
+  background: rgba(8, 10, 15, 0.7);
+}
+
+.plinko-shot-item.is-inactive {
+  opacity: 0.55;
+}
+
+.plinko-shot-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.plinko-shot-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.plinko-shot-name {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.plinko-shot-desc {
+  font-size: 12px;
+  color: var(--color-text-soft);
+}
+
+.plinko-shot-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.plinko-shot-actions .admin-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+}

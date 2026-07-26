@@ -12,6 +12,7 @@
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
     <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/plinko.css" />
   </head>
   <body>
     <div class="page-background"></div>
@@ -141,6 +142,44 @@
 
             <p id="admin-message" class="admin-message"></p>
           </div>
+
+          <div class="card" id="plinko-admin-card" style="display: none;">
+            <p class="eyebrow">Plinko-Game</p>
+            <h1>Shots verwalten</h1>
+            <p class="subtitle">
+              Lege fest, welche Shots im Plinko-Spiel gewonnen werden können.
+              Nur aktive Shots erscheinen im Spiel (jeder gleich wahrscheinlich).
+            </p>
+
+            <div class="admin-controls">
+              <button id="plinko-enabled-toggle" class="btn btn-primary" type="button">
+                Plinko-Spiel aktivieren
+              </button>
+            </div>
+
+            <form id="plinko-shot-form" class="plinko-admin-form">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="plinko-shot-name">Name des Shots*</label>
+                  <input type="text" id="plinko-shot-name" maxlength="40" placeholder="z. B. Tequila" />
+                </div>
+                <div class="form-field">
+                  <label for="plinko-shot-color">Farbe (optional)</label>
+                  <input type="color" id="plinko-shot-color" value="#c99b4b" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="plinko-shot-desc">Beschreibung (optional)</label>
+                  <input type="text" id="plinko-shot-desc" maxlength="80" placeholder="z. B. mit Salz & Zitrone" />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Shot hinzufügen</button>
+            </form>
+
+            <div id="plinko-shots-list" class="plinko-shots-list"></div>
+            <p id="plinko-admin-message" class="admin-message"></p>
+          </div>
         </div>
       </div>
     </main>
@@ -171,5 +210,6 @@
       const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     </script>
     <script src="assets/admin.js"></script>
+    <script src="assets/admin-plinko.js"></script>
   </body>
 </html>

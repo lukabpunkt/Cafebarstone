@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Café Bar Stone – Plinko Shot-Game</title>
+    <meta
+      name="description"
+      content="Plinko-Minigame der Café Bar Stone in Lingen (Ems) – lasst mit euren Freunden die Kugel fallen und findet heraus, welchen Shot jeder an der Bar bestellt."
+    />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/plinko.css" />
+  </head>
+  <body>
+    <div class="page-background"></div>
+    <div class="page-overlay"></div>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="header-left">
+          <a href="index.html" class="logo">
+            <img src="assets/Stonelogo.png" alt="Café Bar Stone" class="logo-img" />
+          </a>
+          <a href="https://www.instagram.com/stonelingen?igsh=Y3pxNmR4dHpoa3h3" target="_blank" rel="noopener" class="instagram-icon-header" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+        <button class="hamburger" id="hamburger-btn" aria-label="Menü öffnen" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-backdrop" id="nav-backdrop"></div>
+        <nav class="nav" id="nav-menu">
+          <a href="index.html" class="nav-link">Startseite</a>
+          <a href="index.html#reservierung" class="nav-link">Reservierung</a>
+          <a href="impressum.html" class="nav-link">Impressum</a>
+          <a href="datenschutz.html" class="nav-link">Datenschutz</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="plinko-section">
+        <div class="container">
+          <div class="plinko-intro">
+            <p class="eyebrow">Café Bar Stone • Shot-Game</p>
+            <h1>Plinko – wer bestellt welchen Shot?</h1>
+            <p>
+              Gebt eure Namen ein, lasst nacheinander die Kugel fallen und lasst
+              das Glück entscheiden: Am Ende zeigt euch die Liste, welchen Shot
+              jeder an der Bar bestellt. Reicht das Handy einfach reihum weiter.
+            </p>
+          </div>
+
+          <div class="plinko-panel">
+            <!-- ===== Screen 1: Setup ===== -->
+            <div id="plinko-setup" class="plinko-screen">
+              <p class="eyebrow">Wer spielt mit?</p>
+              <div id="plinko-players" class="plinko-players"></div>
+              <div class="plinko-setup-actions">
+                <button type="button" id="plinko-add-player" class="btn btn-outline">
+                  + Spieler hinzufügen
+                </button>
+                <button type="button" id="plinko-start" class="btn btn-primary">
+                  Spiel starten
+                </button>
+              </div>
+              <span class="plinko-hint">
+                Mindestens 1 Spieler, maximal 12. Namen dürfen mehrfach vorkommen.
+              </span>
+              <p id="plinko-setup-error" class="plinko-error" aria-live="polite"></p>
+            </div>
+
+            <!-- ===== Screen 2: Spiel ===== -->
+            <div id="plinko-game" class="plinko-screen is-hidden">
+              <div class="plinko-turn-header">
+                <span class="plinko-turn-eyebrow">Am Zug</span>
+                <p id="plinko-current-player" class="plinko-turn-name">—</p>
+                <p id="plinko-progress" class="plinko-progress"></p>
+              </div>
+
+              <div class="plinko-board-wrap">
+                <canvas id="plinko-canvas" width="480" height="560" role="img"
+                  aria-label="Plinko-Spielbrett"></canvas>
+              </div>
+
+              <div class="plinko-play-actions">
+                <button type="button" id="plinko-drop" class="btn btn-primary">
+                  Kugel fallen lassen
+                </button>
+              </div>
+
+              <div id="plinko-legend" class="plinko-legend"></div>
+
+              <!-- Reveal nach dem Fall -->
+              <div id="plinko-reveal" class="plinko-reveal is-hidden">
+                <span class="plinko-reveal-label">Dein Shot</span>
+                <p id="plinko-reveal-shot" class="plinko-reveal-shot">—</p>
+                <p id="plinko-reveal-desc" class="plinko-reveal-desc"></p>
+                <button type="button" id="plinko-next" class="btn btn-primary">
+                  Weiter
+                </button>
+              </div>
+            </div>
+
+            <!-- ===== Screen 3: Ergebnis ===== -->
+            <div id="plinko-results" class="plinko-screen is-hidden">
+              <div class="plinko-results-header">
+                <p class="eyebrow">Runde beendet</p>
+                <h2>Das bestellt ihr an der Bar!</h2>
+                <p>Prost – zeigt diese Liste einfach an der Theke.</p>
+              </div>
+              <ul id="plinko-results-list" class="plinko-results-list"></ul>
+              <div class="plinko-results-actions">
+                <button type="button" id="plinko-restart" class="btn btn-primary">
+                  Nochmal spielen
+                </button>
+              </div>
+            </div>
+
+            <p class="plinko-disclaimer">
+              Nur zum Spaß & für Volljährige. Verantwortungsvoller Umgang mit
+              Alkohol – niemand muss trinken. Kein Kaufzwang.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <p class="footer-title">Café Bar Stone</p>
+          <p>Bar · Platzbuchung &amp; Reservierung</p>
+          <div class="footer-links" style="margin-top: 6px;">
+            <a href="index.html">Startseite</a>
+            <a href="impressum.html">Impressum</a>
+            <a href="datenschutz.html">Datenschutz</a>
+          </div>
+        </div>
+        <div class="footer-watermark">
+          <img src="assets/Watermark_white.png" alt="" class="footer-watermark-img" />
+        </div>
+        <div class="footer-meta">
+          <p>© <span id="year"></span> Café Bar Stone</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const supabaseUrl = "https://vhpqwuplwoycimewxmai.supabase.co";
+      const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZocHF3dXBsd295Y2ltZXd4bWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NzI0MDMsImV4cCI6MjA4ODE0ODQwM30.AHQkEv5zZAtRzt4yhUReQsrl-fo-ZaEE0QpHZfOID1s";
+      const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+    <script src="assets/plinko.js"></script>
+  </body>
+</html>
