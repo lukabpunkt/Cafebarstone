@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("plinko-canvas");
   const ctx = canvas.getContext("2d");
 
-  const MAX_PLAYERS = 12;
+  const MAX_PLAYERS = 10;
 
   // Akzent-nahe Palette für Shots ohne eigene Farbe
   const PALETTE = [
