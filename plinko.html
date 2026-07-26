@@ -2,7 +2,8 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+    <meta name="theme-color" content="#07090c" />
     <title>Café Bar Stone – Plinko Shot-Game</title>
     <meta
       name="description"
@@ -46,87 +47,75 @@
     <main>
       <section class="plinko-section">
         <div class="container">
-          <div class="plinko-intro">
-            <p class="eyebrow">Café Bar Stone • Shot-Game</p>
-            <h1>Plinko – wer bestellt welchen Shot?</h1>
-            <p>
-              Gebt eure Namen ein, lasst nacheinander die Kugel fallen und lasst
-              das Glück entscheiden: Am Ende zeigt euch die Liste, welchen Shot
-              jeder an der Bar bestellt. Reicht das Handy einfach reihum weiter.
-            </p>
-          </div>
+          <!-- ===== Screen 1: Setup ===== -->
+          <div id="plinko-setup" class="plinko-screen">
+            <div class="plinko-intro">
+              <p class="eyebrow">Café Bar Stone • Shot-Game</p>
+              <h1>Plinko 🎯</h1>
+              <p>
+                Gebt eure Namen ein, lasst reihum die Kugel fallen und lasst das
+                Glück entscheiden – am Ende zeigt euch die Liste, welchen Shot
+                jeder an der Bar bestellt. Handy einfach weiterreichen.
+              </p>
+            </div>
 
-          <div class="plinko-panel">
-            <!-- ===== Screen 1: Setup ===== -->
-            <div id="plinko-setup" class="plinko-screen">
+            <div class="plinko-panel">
               <p class="eyebrow">Wer spielt mit?</p>
               <div id="plinko-players" class="plinko-players"></div>
-              <div class="plinko-setup-actions">
-                <button type="button" id="plinko-add-player" class="btn btn-outline">
-                  + Spieler hinzufügen
-                </button>
-                <button type="button" id="plinko-start" class="btn btn-primary">
-                  Spiel starten
-                </button>
-              </div>
+              <button type="button" id="plinko-add-player" class="btn btn-outline plinko-add-btn">
+                + Spieler hinzufügen
+              </button>
               <span class="plinko-hint">
                 Mindestens 1 Spieler, maximal 10. Namen dürfen mehrfach vorkommen.
               </span>
               <p id="plinko-setup-error" class="plinko-error" aria-live="polite"></p>
+              <button type="button" id="plinko-start" class="btn btn-primary plinko-start-btn">
+                Los geht's 🎉
+              </button>
             </div>
-
-            <!-- ===== Screen 2: Spiel ===== -->
-            <div id="plinko-game" class="plinko-screen is-hidden">
-              <div class="plinko-turn-header">
-                <span class="plinko-turn-eyebrow">Am Zug</span>
-                <p id="plinko-current-player" class="plinko-turn-name">—</p>
-                <p id="plinko-progress" class="plinko-progress"></p>
-              </div>
-
-              <div class="plinko-board-wrap">
-                <canvas id="plinko-canvas" width="480" height="560" role="img"
-                  aria-label="Plinko-Spielbrett"></canvas>
-              </div>
-
-              <div class="plinko-play-actions">
-                <button type="button" id="plinko-drop" class="btn btn-primary">
-                  Kugel fallen lassen
-                </button>
-              </div>
-
-              <div id="plinko-legend" class="plinko-legend"></div>
-
-              <!-- Reveal nach dem Fall -->
-              <div id="plinko-reveal" class="plinko-reveal is-hidden">
-                <span class="plinko-reveal-label">Dein Shot</span>
-                <p id="plinko-reveal-shot" class="plinko-reveal-shot">—</p>
-                <p id="plinko-reveal-desc" class="plinko-reveal-desc"></p>
-                <button type="button" id="plinko-next" class="btn btn-primary">
-                  Weiter
-                </button>
-              </div>
-            </div>
-
-            <!-- ===== Screen 3: Ergebnis ===== -->
-            <div id="plinko-results" class="plinko-screen is-hidden">
-              <div class="plinko-results-header">
-                <p class="eyebrow">Runde beendet</p>
-                <h2>Das bestellt ihr an der Bar!</h2>
-                <p>Prost – zeigt diese Liste einfach an der Theke.</p>
-              </div>
-              <ul id="plinko-results-list" class="plinko-results-list"></ul>
-              <div class="plinko-results-actions">
-                <button type="button" id="plinko-restart" class="btn btn-primary">
-                  Nochmal spielen
-                </button>
-              </div>
-            </div>
-
-            <p class="plinko-disclaimer">
-              Nur zum Spaß & für Volljährige. Verantwortungsvoller Umgang mit
-              Alkohol – niemand muss trinken. Kein Kaufzwang.
-            </p>
           </div>
+
+          <!-- ===== Screen 2: Spiel ===== -->
+          <div id="plinko-game" class="plinko-screen is-hidden">
+            <div class="plinko-turn-header">
+              <span class="plinko-turn-eyebrow">Am Zug</span>
+              <p id="plinko-current-player" class="plinko-turn-name">—</p>
+              <p id="plinko-progress" class="plinko-progress"></p>
+            </div>
+
+            <div class="plinko-board-wrap">
+              <canvas id="plinko-canvas" width="480" height="640" role="img"
+                aria-label="Plinko-Spielbrett"></canvas>
+            </div>
+
+            <div id="plinko-legend" class="plinko-legend"></div>
+
+            <div class="plinko-play-actions">
+              <button type="button" id="plinko-drop" class="btn btn-primary plinko-drop-btn">
+                Kugel fallen lassen
+              </button>
+            </div>
+          </div>
+
+          <!-- ===== Screen 3: Ergebnis ===== -->
+          <div id="plinko-results" class="plinko-screen is-hidden">
+            <div class="plinko-results-header">
+              <p class="eyebrow">Runde beendet</p>
+              <h2>Das bestellt ihr an der Bar!</h2>
+              <p>Prost – zeigt diese Liste einfach an der Theke.</p>
+            </div>
+            <ul id="plinko-results-list" class="plinko-results-list"></ul>
+            <div class="plinko-results-actions">
+              <button type="button" id="plinko-restart" class="btn btn-primary plinko-start-btn">
+                Nochmal spielen
+              </button>
+            </div>
+          </div>
+
+          <p class="plinko-disclaimer">
+            Nur zum Spaß & für Volljährige. Verantwortungsvoller Umgang mit
+            Alkohol – niemand muss trinken. Kein Kaufzwang.
+          </p>
         </div>
       </section>
     </main>
@@ -150,6 +139,23 @@
         </div>
       </div>
     </footer>
+
+    <!-- ===== Vollbild-Gewinn-Feier ===== -->
+    <div id="plinko-celebration" class="plinko-celebration is-hidden" aria-hidden="true">
+      <div class="plinko-celebration-rays"></div>
+      <div class="plinko-celebration-glow" id="celebration-glow"></div>
+      <canvas id="plinko-confetti" class="plinko-confetti"></canvas>
+      <div class="plinko-celebration-inner">
+        <p class="plinko-celebration-eyebrow">
+          🎉 <span id="celebration-player">Spieler</span> trinkt
+        </p>
+        <p id="celebration-shot" class="plinko-celebration-shot">—</p>
+        <p id="celebration-desc" class="plinko-celebration-desc"></p>
+        <button type="button" id="plinko-next" class="btn btn-primary plinko-celebration-btn">
+          Nächster Spieler
+        </button>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
