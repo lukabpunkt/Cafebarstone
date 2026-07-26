@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultsList = document.getElementById("plinko-results-list");
   const restartBtn = document.getElementById("plinko-restart");
   const shareBtn = document.getElementById("plinko-share");
+  const saveBtn = document.getElementById("plinko-save");
   const sharePreview = document.getElementById("plinko-share-preview");
   const shareImg = document.getElementById("plinko-share-img");
   const shareDownload = document.getElementById("plinko-share-download");
@@ -903,6 +904,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (nextBtn) nextBtn.addEventListener("click", onNext);
   if (restartBtn) restartBtn.addEventListener("click", restart);
   if (shareBtn) shareBtn.addEventListener("click", shareResults);
+  if (saveBtn) saveBtn.addEventListener("click", () => {
+    try { showSharePreview(renderShareCard()); } catch (e) { console.error(e); }
+  });
   if (shareClose) shareClose.addEventListener("click", hideSharePreview);
   if (sharePreview) sharePreview.addEventListener("click", (e) => { if (e.target === sharePreview) hideSharePreview(); });
 

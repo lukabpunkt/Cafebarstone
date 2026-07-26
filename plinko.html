@@ -115,10 +115,13 @@
             </div>
             <ul id="plinko-results-list" class="plinko-results-list"></ul>
             <div class="plinko-results-actions">
-              <button type="button" id="plinko-share" class="btn btn-outline plinko-share-btn">
+              <button type="button" id="plinko-share" class="btn btn-primary plinko-share-btn">
                 Als Story teilen 📲
               </button>
-              <button type="button" id="plinko-restart" class="btn btn-primary plinko-start-btn">
+              <button type="button" id="plinko-save" class="btn btn-outline plinko-share-btn">
+                Bild speichern 📷
+              </button>
+              <button type="button" id="plinko-restart" class="btn btn-outline plinko-share-btn">
                 Nochmal spielen
               </button>
             </div>
@@ -174,7 +177,16 @@
     <div id="plinko-share-preview" class="plinko-share-preview is-hidden" aria-hidden="true">
       <div class="plinko-share-inner">
         <img id="plinko-share-img" class="plinko-share-img" alt="Plinko-Ergebnis Café Bar Stone" />
-        <p class="plinko-share-hint">Bild lange gedrückt halten zum Speichern – oder herunterladen:</p>
+        <p class="plinko-share-hint">Bild lange gedrückt halten → „Bild sichern" – oder unten herunterladen.</p>
+        <div class="plinko-share-steps">
+          <p class="plinko-share-steps-title">So postest du es als Story:</p>
+          <ol>
+            <li>Bild speichern</li>
+            <li>Instagram oder Snapchat öffnen</li>
+            <li>Neue Story → dieses Bild auswählen</li>
+            <li>Posten 🎉</li>
+          </ol>
+        </div>
         <div class="plinko-share-preview-actions">
           <a id="plinko-share-download" class="btn btn-primary" download="plinko-cafebarstone.png">Herunterladen</a>
           <button type="button" id="plinko-share-close" class="btn btn-outline">Schließen</button>

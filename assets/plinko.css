@@ -617,7 +617,35 @@
 .plinko-share-hint {
   font-size: 12px;
   color: var(--color-text-soft);
-  margin: 12px 0;
+  margin: 12px 0 8px;
+}
+.plinko-share-steps {
+  text-align: left;
+  background: rgba(8, 10, 15, 0.7);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  padding: 12px 14px 12px 4px;
+  margin: 0 0 14px;
+}
+.plinko-share-steps-title {
+  margin: 0 0 6px 16px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.plinko-share-steps ol {
+  margin: 0;
+  padding-left: 28px;
+}
+.plinko-share-steps li {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+.plinko-share-steps li::marker {
+  color: var(--color-accent);
+  font-weight: 700;
 }
 .plinko-share-preview-actions {
   display: flex;
