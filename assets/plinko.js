@@ -656,7 +656,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (betWon) {
         const t = document.createElement("span");
         t.className = "plinko-cel-tag is-bet";
-        t.textContent = "🎯 Richtig getippt – einer gibt dir aus!";
+        const others = players.filter((_, i) => i !== currentIndex);
+        if (others.length > 0) {
+          const payer = others[Math.floor(Math.random() * others.length)];
+          const b = document.createElement("b");
+          b.textContent = payer.name;
+          t.append("🎯 Richtig getippt! ", b, " gibt dir aus! 🍻");
+        } else {
+          t.textContent = "🎯 Richtig getippt – die Runde geht aufs Haus! 🍻";
+        }
         celTagsEl.appendChild(t);
       }
     }
@@ -732,74 +740,100 @@ document.addEventListener("DOMContentLoaded", () => {
   //  Teilbare Story-Karte (1080×1920)
   // ============================================================
   function renderShareCard() {
-    const CW = 1080, CH = 1920;
+    const CW = 1080, CH = 1920, MX = 108;
     const cv = document.createElement("canvas");
     cv.width = CW; cv.height = CH;
     const g = cv.getContext("2d");
 
-    // Hintergrund
-    g.fillStyle = "#07090c";
-    g.fillRect(0, 0, CW, CH);
-    const bg = g.createRadialGradient(CW / 2, CH * 0.32, 80, CW / 2, CH * 0.32, CH * 0.7);
-    bg.addColorStop(0, "rgba(201,155,75,0.18)");
-    bg.addColorStop(1, "rgba(2,2,4,0)");
+    // Hintergrund + Gold-Glow oben
+    const bg = g.createLinearGradient(0, 0, 0, CH);
+    bg.addColorStop(0, "#0b0e14");
+    bg.addColorStop(1, "#05060a");
     g.fillStyle = bg; g.fillRect(0, 0, CW, CH);
+    const glow = g.createRadialGradient(CW / 2, 380, 60, CW / 2, 380, 760);
+    glow.addColorStop(0, "rgba(201,155,75,0.22)");
+    glow.addColorStop(1, "rgba(201,155,75,0)");
+    g.fillStyle = glow; g.fillRect(0, 0, CW, 960);
 
-    // Logo
+    // Zierrahmen
+    g.strokeStyle = "rgba(201,155,75,0.35)";
+    g.lineWidth = 3;
+    roundRect(g, 40, 40, CW - 80, CH - 80, 42); g.stroke();
+
+    // Logo / Titel
     if (logoReady) {
-      const lw = 420, lh = lw * (logoImg.height / logoImg.width);
-      g.drawImage(logoImg, (CW - lw) / 2, 150, lw, lh);
+      const lw = 440, lh = lw * (logoImg.height / logoImg.width);
+      g.drawImage(logoImg, (CW - lw) / 2, 155, lw, lh);
     } else {
-      g.fillStyle = "#f7f3ea";
-      g.font = "700 84px -apple-system, system-ui, sans-serif";
-      g.textAlign = "center"; g.textBaseline = "middle";
-      g.fillText("CAFÉ BAR STONE", CW / 2, 230);
+      g.fillStyle = "#f7f3ea"; g.textAlign = "center"; g.textBaseline = "alphabetic";
+      g.font = "800 82px -apple-system, system-ui, sans-serif";
+      g.fillText("CAFÉ BAR STONE", CW / 2, 270);
     }
 
-    // Titel
-    g.textAlign = "center";
+    g.textAlign = "center"; g.textBaseline = "alphabetic";
     g.fillStyle = "#c99b4b";
-    g.font = "700 40px -apple-system, system-ui, sans-serif";
-    g.fillText("PLINKO · SHOT-GAME", CW / 2, 470);
+    g.font = "700 36px -apple-system, system-ui, sans-serif";
+    drawSpaced(g, "PLINKO · SHOT-GAME", CW / 2, 476, 7);
     g.fillStyle = "#f7f3ea";
-    g.font = "800 76px -apple-system, system-ui, sans-serif";
-    g.fillText("Wer trinkt was? 🍻", CW / 2, 560);
+    g.font = "800 72px -apple-system, system-ui, sans-serif";
+    g.fillText("Wer trinkt was? 🍻", CW / 2, 566);
 
-    // Liste
+    // Divider oben
+    g.strokeStyle = "rgba(255,255,255,0.12)"; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(MX, 632); g.lineTo(CW - MX, 632); g.stroke();
+
+    // Liste – vertikal zentriert, alles bündig
     const n = players.length;
-    const listTop = 700, listBottom = 1680;
-    const rowH = Math.min(150, (listBottom - listTop) / Math.max(1, n));
-    const fs = clamp(rowH * 0.42, 30, 60);
+    const listTop = 690, listBottom = 1690;
+    const rowH = Math.min(148, (listBottom - listTop) / Math.max(1, n));
+    const startY = listTop + Math.max(0, ((listBottom - listTop) - rowH * n) / 2);
+    const nameFs = clamp(rowH * 0.40, 32, 54);
+    const shotFs = nameFs * 0.92;
+    const rowInnerH = Math.min(rowH * 0.84, 124);
+    const cardPad = 34;
+    const swSize = nameFs * 0.95;
+    const swX = MX + cardPad;
+    const nameX = swX + swSize + 28;      // gleiche Startlinie für ALLE Namen
+    const shotRight = CW - MX - cardPad;  // gleiche rechte Kante für ALLE Shots
+
     players.forEach((p, i) => {
-      const y = listTop + rowH * i + rowH / 2;
+      const cy = startY + rowH * i + rowH / 2;
       const col = shotColor(p.shotIndex);
-      // Karte
-      g.fillStyle = "rgba(255,255,255,0.04)";
-      roundRect(g, 90, y - rowH * 0.42, CW - 180, rowH * 0.84, 24);
-      g.fill();
-      // Swatch
+
+      // Zeilen-Karte
+      g.fillStyle = "rgba(255,255,255,0.045)";
+      roundRect(g, MX, cy - rowInnerH / 2, CW - 2 * MX, rowInnerH, 26); g.fill();
+      g.strokeStyle = "rgba(255,255,255,0.07)"; g.lineWidth = 1;
+      roundRect(g, MX, cy - rowInnerH / 2, CW - 2 * MX, rowInnerH, 26); g.stroke();
+
+      // Farb-Swatch
       g.fillStyle = col;
-      roundRect(g, 130, y - fs * 0.5, fs, fs, 8); g.fill();
-      // Name
+      roundRect(g, swX, cy - swSize / 2, swSize, swSize, 9); g.fill();
+
+      // Shot rechtsbündig (zuerst messen, um Namensbreite zu begrenzen)
+      const shotText = resultLabel(p);
+      g.font = `600 ${shotFs}px -apple-system, system-ui, sans-serif`;
+      const shotW = g.measureText(shotText).width;
+      g.textAlign = "right"; g.textBaseline = "middle";
+      g.fillStyle = col;
+      g.fillText(shotText, shotRight, cy);
+
+      // Name linksbündig, sauber abgeschnitten falls zu lang
+      g.font = `700 ${nameFs}px -apple-system, system-ui, sans-serif`;
+      const nameMax = (shotRight - shotW - 32) - nameX;
+      g.textAlign = "left"; g.textBaseline = "middle";
       g.fillStyle = "#f7f3ea";
-      g.textAlign = "left";
-      g.font = `700 ${fs}px -apple-system, system-ui, sans-serif`;
-      g.fillText(clip(p.name, 16), 130 + fs + 28, y);
-      // Shot
-      g.fillStyle = col;
-      g.textAlign = "right";
-      g.font = `600 ${fs * 0.9}px -apple-system, system-ui, sans-serif`;
-      g.fillText(clip(resultLabel(p), 22), CW - 130, y);
+      g.fillText(fitText(g, p.name, nameMax), nameX, cy);
     });
 
-    // Footer
-    g.textAlign = "center";
-    g.fillStyle = "#c99b4b";
-    g.font = "600 40px -apple-system, system-ui, sans-serif";
-    g.fillText("@stonelingen", CW / 2, 1770);
-    g.fillStyle = "rgba(193,188,207,0.7)";
-    g.font = "400 32px -apple-system, system-ui, sans-serif";
-    g.fillText(GAME_URL, CW / 2, 1830);
+    // Divider unten + Footer
+    g.strokeStyle = "rgba(255,255,255,0.12)"; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(MX, 1742); g.lineTo(CW - MX, 1742); g.stroke();
+    g.textAlign = "center"; g.textBaseline = "alphabetic";
+    g.fillStyle = "#c99b4b"; g.font = "700 42px -apple-system, system-ui, sans-serif";
+    g.fillText("@stonelingen", CW / 2, 1802);
+    g.fillStyle = "rgba(193,188,207,0.7)"; g.font = "400 30px -apple-system, system-ui, sans-serif";
+    g.fillText(GAME_URL, CW / 2, 1852);
 
     return cv.toDataURL("image/png");
   }
@@ -812,7 +846,24 @@ document.addEventListener("DOMContentLoaded", () => {
     g.arcTo(x, y, x + w, y, r);
     g.closePath();
   }
-  function clip(s, max) { s = String(s); return s.length > max ? s.slice(0, max - 1) + "…" : s; }
+  function fitText(g, text, maxW) {
+    text = String(text);
+    if (g.measureText(text).width <= maxW) return text;
+    let t = text;
+    while (t.length > 1 && g.measureText(t + "…").width > maxW) t = t.slice(0, -1);
+    return t + "…";
+  }
+  function drawSpaced(g, text, cx, y, spacing) {
+    const chars = [...String(text)];
+    let total = 0;
+    for (const c of chars) total += g.measureText(c).width + spacing;
+    total -= spacing;
+    const prev = g.textAlign;
+    g.textAlign = "left";
+    let x = cx - total / 2;
+    for (const c of chars) { g.fillText(c, x, y); x += g.measureText(c).width + spacing; }
+    g.textAlign = prev;
+  }
 
   async function shareResults() {
     let dataUrl;
