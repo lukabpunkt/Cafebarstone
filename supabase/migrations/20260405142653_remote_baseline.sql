@@ -1,0 +1,12 @@
+-- ============================================================
+-- Platzhalter / Baseline – Café Bar Stone
+-- ============================================================
+-- Diese Migration wurde ursprünglich direkt auf der Remote-DB
+-- (Supabase SQL-Editor) angewendet und war lokal nicht versioniert.
+-- Dieser Platzhalter gleicht die Migrationshistorie ab, damit
+-- `supabase db push` neuere Migrationen anwenden kann.
+-- Sie ist auf der Remote-DB bereits als "applied" markiert und
+-- wird daher beim Push NICHT erneut ausgeführt (No-Op).
+-- ============================================================
+
+-- (bewusst leer)
