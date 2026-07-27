@@ -64,6 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // A11y: Pflichtfelder programmatisch als required auszeichnen
+  ["salutation", "persons", "firstName", "lastName", "email", "phone", "date", "time"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("aria-required", "true");
+  });
+
   let reservationsOpen = true;
   let openingDays = [4, 5, 6]; // Fallback: Do, Fr, Sa
   let openFromHour = 17;       // Fallback: 17:00
@@ -192,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (id === "persons") {
         const persons = Number(value);
-        if (!Number.isFinite(persons) || persons < 1 || persons > 20) {
+        if (!Number.isInteger(persons) || persons < 1 || persons > 20) {
           field.classList.add("error");
           hasError = true;
         }
@@ -221,6 +227,14 @@ document.addEventListener("DOMContentLoaded", () => {
         dsgvoCheckbox.classList.add("error");
         hasError = true;
       }
+    }
+
+    // A11y: aria-invalid spiegeln + Fokus auf erstes Fehlerfeld
+    form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+    const errorFields = form.querySelectorAll(".error");
+    errorFields.forEach((el) => el.setAttribute("aria-invalid", "true"));
+    if (hasError && errorFields[0] && typeof errorFields[0].focus === "function") {
+      errorFields[0].focus();
     }
 
     if (!messageBox) return;

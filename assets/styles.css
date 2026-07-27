@@ -69,7 +69,7 @@ body {
       rgba(42, 71, 94, 0.55),
       transparent 60%
     ),
-    url("https://images.pexels.com/photos/2147489/pexels-photo-2147489.jpeg?auto=compress&cs=tinysrgb&w=1600");
+    url("hero.jpg");
   background-size: cover;
   background-position: center;
   filter: grayscale(0.3) saturate(0.8);
