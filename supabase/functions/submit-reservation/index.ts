@@ -22,6 +22,23 @@ const AREA_MAP: Record<string, string> = {
   Nichtraucherbereich: "non_smoking",
 };
 
+function escapeHtml(s: string): string {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function buildOwnerEmailHtml(p: {
+  name: string; email: string; phone: string; dateStr: string;
+  timeStr: string; areaLabel: string; partySize: number; notes: string;
+}): string {
+  const row = (l: string, v: string) =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);font:600 11px -apple-system,sans-serif;letter-spacing:0.1em;text-transform:uppercase;color:#c1bccf;width:38%;">${l}</td><td style="padding:8px 0 8px 12px;border-bottom:1px solid rgba(255,255,255,0.08);font:15px -apple-system,sans-serif;color:#f7f3ea;">${escapeHtml(v)}</td></tr>`;
+  const notesRow = p.notes
+    ? `<tr><td colspan="2" style="padding:14px 0 0;"><p style="margin:0 0 6px;font:600 11px -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#c99b4b;">Besondere Wünsche</p><p style="margin:0;font:14px -apple-system,sans-serif;line-height:1.6;color:#c1bccf;border-left:3px solid rgba(201,155,75,0.5);padding:8px 12px;background:#080a0f;">${escapeHtml(p.notes)}</p></td></tr>`
+    : "";
+  return `<!DOCTYPE html><html lang="de"><body style="margin:0;background:#07090c;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><table role="presentation" width="100%" style="max-width:520px;margin:0 auto;background:#10131a;border:1px solid rgba(255,255,255,0.12);border-radius:16px;"><tr><td style="padding:22px 22px 6px;"><p style="margin:0 0 4px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#c99b4b;">Café Bar Stone · Lingen (Ems)</p><h1 style="margin:0;font-size:22px;font-weight:500;color:#f7f3ea;">Neue Reservierungsanfrage</h1></td></tr><tr><td style="padding:14px 22px 22px;"><table role="presentation" width="100%" style="border-collapse:collapse;">${row("Datum", p.dateStr)}${row("Uhrzeit", p.timeStr)}${row("Bereich", p.areaLabel)}${row("Personen", String(p.partySize))}${row("Name", p.name)}${row("E-Mail", p.email)}${row("Telefon", p.phone)}${notesRow}</table><p style="margin:18px 0 0;font-size:13px;color:#8a8499;">Zum Bestätigen im Admin-Dashboard einloggen.</p></td></tr></table></body></html>`;
+}
+
 function getCorsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("Origin") ?? "";
   const allowed = ALLOWED_ORIGINS.some(
@@ -86,8 +103,8 @@ Deno.serve(async (req) => {
     return jsonError("Ungültige Telefonnummer", 400, CORS_HEADERS);
   }
 
-  if (!Number.isFinite(partySizeRaw) || partySizeRaw < 1 || partySizeRaw > 20) {
-    return jsonError("Personenanzahl muss zwischen 1 und 20 liegen", 400, CORS_HEADERS);
+  if (!Number.isInteger(partySizeRaw) || partySizeRaw < 1 || partySizeRaw > 20) {
+    return jsonError("Personenanzahl muss eine ganze Zahl zwischen 1 und 20 sein", 400, CORS_HEADERS);
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue) || !/^\d{2}:\d{2}$/.test(timeValue)) {
@@ -96,22 +113,29 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-  // --- Öffnungszeiten aus DB laden (Fallback auf hardcoded Werte) ---
+  // --- Öffnungszeiten & Status aus DB laden (Fallback auf hardcoded Werte) ---
   let openDays = [4, 5, 6];
   let openFromHour = 17;
   let lastSlotHour = 20;
+  let reservationsOpen = true;
   try {
     const { data: settings } = await supabase
       .from("business_settings")
-      .select("open_days, open_from_hour, last_slot_hour")
+      .select("reservations_open, open_days, open_from_hour, last_slot_hour")
+      .order("id", { ascending: true })
       .limit(1)
-      .single();
+      .maybeSingle();
     if (settings) {
+      if (settings.reservations_open === false) reservationsOpen = false;
       if (Array.isArray(settings.open_days) && settings.open_days.length > 0) openDays = settings.open_days;
       if (typeof settings.open_from_hour === "number") openFromHour = settings.open_from_hour;
       if (typeof settings.last_slot_hour === "number") lastSlotHour = settings.last_slot_hour;
     }
   } catch {}
+
+  if (!reservationsOpen) {
+    return jsonError("Online-Reservierungen sind derzeit nicht möglich. Bitte kontaktieren Sie uns direkt.", 403, CORS_HEADERS);
+  }
 
   // --- Öffnungszeiten validieren ---
   const [hoursStr, minutesStr] = timeValue.split(":");
@@ -186,6 +210,34 @@ Deno.serve(async (req) => {
       }
     }
     return jsonError(userMessage, 400, CORS_HEADERS);
+  }
+
+  // --- Betreiber serverseitig benachrichtigen (Fehler blockt die Buchung NICHT) ---
+  try {
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    const OWNER_EMAIL = Deno.env.get("OWNER_EMAIL") ?? "stone.lingen@web.de";
+    if (RESEND_API_KEY) {
+      const tz = "Europe/Berlin";
+      const dateStr = reservationDateTime.toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", timeZone: tz });
+      const timeStr = reservationDateTime.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: tz });
+      const areaLabel = areaCode === "smoking" ? "Raucherbereich" : "Nichtraucherbereich";
+      const fullName = `${firstName} ${lastName}`.trim();
+      const html = buildOwnerEmailHtml({ name: fullName, email, phone, dateStr, timeStr, areaLabel, partySize: partySizeRaw, notes });
+      const text = `Neue Reservierungsanfrage – Café Bar Stone\n\nDatum: ${dateStr}\nUhrzeit: ${timeStr}\nBereich: ${areaLabel}\nPersonen: ${partySizeRaw}\nName: ${fullName}\nE-Mail: ${email}\nTelefon: ${phone}${notes ? `\n\nBesondere Wünsche:\n${notes}` : ""}`;
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${RESEND_API_KEY}` },
+        body: JSON.stringify({
+          from: "Café Bar Stone <reservierung@noreply.cafebarstone.de>",
+          to: OWNER_EMAIL,
+          subject: `Neue Reservierungsanfrage – ${fullName} – ${dateStr}`,
+          html,
+          text,
+        }),
+      });
+    }
+  } catch (e) {
+    console.error("owner notify:", e);
   }
 
   return new Response(JSON.stringify({ ok: true }), {

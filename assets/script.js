@@ -342,27 +342,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const defaultArea = form.querySelector('input[name="area"][value="Nichtraucherbereich"]');
       if (defaultArea instanceof HTMLInputElement) defaultArea.checked = true;
 
-      // Ladenbesitzer per E-Mail über neue Anfrage informieren (fire-and-forget)
-      const reservationDate = new Date(`${date}T${time}`);
-      const tz = "Europe/Berlin";
-      supabaseClient.functions.invoke("notify-owner", {
-        body: {
-          salutation,
-          first_name: firstName,
-          last_name: lastName,
-          email,
-          phone,
-          date_str: reservationDate.toLocaleDateString("de-DE", {
-            weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", timeZone: tz,
-          }),
-          time_str: reservationDate.toLocaleTimeString("de-DE", {
-            hour: "2-digit", minute: "2-digit", timeZone: tz,
-          }),
-          area_label: areaRaw,
-          party_size: partySize,
-          notes: notes ?? "",
-        },
-      }).catch((err) => console.error("notify-owner:", err));
+      // Die Betreiber-Benachrichtigung wird jetzt serverseitig in der
+      // Edge Function "submit-reservation" versendet (kein öffentlicher Client-Aufruf mehr).
     } catch (error) {
       console.error(error);
       messageBox.textContent = "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.";

@@ -45,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data, error } = await supabaseClient
         .from("business_settings")
         .select("id, plinko_enabled")
+        .order("id", { ascending: true })
         .limit(1);
       if (error) throw error;
       if (data && data.length > 0) {

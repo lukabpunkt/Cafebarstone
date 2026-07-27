@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data, error } = await supabaseClient
         .from("business_settings")
         .select("id, reservations_open")
+        .order("id", { ascending: true })
         .limit(1);
       if (error) {
         console.error("business_settings:", error);
@@ -395,6 +396,22 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("keydown", onKeydown);
   }
 
+  function enterDashboard() {
+    if (dashboard) dashboard.style.display = "block";
+    if (logoutBtn) logoutBtn.classList.add("is-visible");
+    setToday();
+    loadBusinessSettings(true);
+    loadReservationsForDateRange();
+  }
+
+  // Bestehende Session bei Reload wiederherstellen (nicht neu einloggen müssen)
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if (data && data.session) {
+      if (loginMessage) loginMessage.textContent = "Automatisch angemeldet.";
+      enterDashboard();
+    }
+  });
+
   // --- Login ---
   if (loginForm) {
     loginForm.addEventListener("submit", async (event) => {
@@ -421,11 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       loginMessage.textContent = "Erfolgreich angemeldet.";
-      dashboard.style.display = "block";
-      if (logoutBtn) logoutBtn.classList.add("is-visible");
-      setToday();
-      loadBusinessSettings(true);
-      loadReservationsForDateRange();
+      enterDashboard();
     });
   }
 
