@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentPlayerEl = document.getElementById("plinko-current-player");
   const progressEl = document.getElementById("plinko-progress");
   const dropBtn = document.getElementById("plinko-drop");
+  const fsBtn = document.getElementById("plinko-fullscreen");
   const legendEl = document.getElementById("plinko-legend");
 
   const tipBar = document.getElementById("plinko-tip");
@@ -704,6 +705,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showResults() {
+    setImmersive(false);
     if (resultsList) {
       resultsList.innerHTML = "";
       players.forEach((p, idx) => {
@@ -731,6 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function restart() {
     hideCelebration();
     hideSharePreview();
+    setImmersive(false);
     players = [];
     currentIndex = 0;
     showScreen(setupScreen);
@@ -963,6 +966,44 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if (shareClose) shareClose.addEventListener("click", hideSharePreview);
   if (sharePreview) sharePreview.addEventListener("click", (e) => { if (e.target === sharePreview) hideSharePreview(); });
+
+  // ---- Vollbild / Immersive-Modus ----
+  function nativeFsElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+  function refitBoard() {
+    if (!gameScreen.classList.contains("is-hidden") && !animating && !celebrationVisible) {
+      fitCanvas();
+      drawBoard(null, -1, -1, 0);
+    }
+  }
+  function setImmersive(on) {
+    gameScreen.classList.toggle("is-immersive", on);
+    document.body.classList.toggle("plinko-no-scroll", on);
+    if (fsBtn) fsBtn.setAttribute("aria-label", on ? "Vollbild verlassen" : "Vollbild");
+    try {
+      if (on) {
+        const req = gameScreen.requestFullscreen || gameScreen.webkitRequestFullscreen;
+        if (req) { const p = req.call(gameScreen); if (p && p.catch) p.catch(() => {}); }
+      } else if (nativeFsElement()) {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) { const p = exit.call(document); if (p && p.catch) p.catch(() => {}); }
+      }
+    } catch (_) {}
+    setTimeout(refitBoard, 80);
+  }
+  function onFsChange() {
+    // natives Vollbild extern verlassen (z. B. ESC) -> Immersive ebenfalls beenden
+    if (!nativeFsElement() && gameScreen.classList.contains("is-immersive")) {
+      gameScreen.classList.remove("is-immersive");
+      document.body.classList.remove("plinko-no-scroll");
+      if (fsBtn) fsBtn.setAttribute("aria-label", "Vollbild");
+      setTimeout(refitBoard, 80);
+    }
+  }
+  if (fsBtn) fsBtn.addEventListener("click", () => setImmersive(!gameScreen.classList.contains("is-immersive")));
+  document.addEventListener("fullscreenchange", onFsChange);
+  document.addEventListener("webkitfullscreenchange", onFsChange);
 
   window.addEventListener("resize", () => {
     if (!gameScreen.classList.contains("is-hidden") && !animating && !celebrationVisible) {

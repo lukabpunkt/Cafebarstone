@@ -130,12 +130,54 @@
    ============================================================ */
 
 #plinko-game {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: calc(100svh - 150px);
 }
 #plinko-game.is-hidden { display: none !important; }
+
+/* Vollbild-/Immersive-Umschalter */
+.plinko-fs-btn {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  z-index: 8;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(8, 10, 15, 0.72);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.plinko-fs-btn:hover { background: var(--color-accent-soft); border-color: rgba(201, 155, 75, 0.5); }
+.plinko-fs-btn:active { transform: scale(0.92); }
+.plinko-fs-btn svg { width: 20px; height: 20px; }
+.plinko-fs-btn .fs-close { display: none; }
+#plinko-game.is-immersive .plinko-fs-btn .fs-open { display: none; }
+#plinko-game.is-immersive .plinko-fs-btn .fs-close { display: inline-block; }
+
+/* Immersive: füllt den kompletten Viewport (auch als Fallback ohne native Fullscreen-API) */
+#plinko-game.is-immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  min-height: 0;
+  margin: 0;
+  padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+  background: radial-gradient(circle at top, rgba(201, 155, 75, 0.08), transparent 60%), #07090c;
+  overflow-y: auto;
+  justify-content: center;
+}
+#plinko-game.is-immersive .plinko-fs-btn { top: max(8px, env(safe-area-inset-top)); right: 10px; }
+
+body.plinko-no-scroll { overflow: hidden; }
 
 .plinko-turn-header {
   text-align: center;
