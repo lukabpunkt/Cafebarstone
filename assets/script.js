@@ -108,6 +108,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return { valid: false, message: `Reservierungen sind nur bis ${lastSlotHour}:00 Uhr möglich.` };
     }
 
+    const when = new Date(`${dateValue}T${timeValue}`);
+    if (!Number.isNaN(when.getTime()) && when.getTime() <= Date.now()) {
+      return { valid: false, message: "Bitte wählen Sie einen Zeitpunkt in der Zukunft." };
+    }
+
     return { valid: true };
   }
 
@@ -268,6 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!openingHoursValidation.valid) {
       messageBox.textContent = openingHoursValidation.message;
       messageBox.className = "form-message visible error";
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Anfrage senden"; }
       return;
     }
 

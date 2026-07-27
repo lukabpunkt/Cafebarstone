@@ -407,7 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function hapticTick() {
       if (reducedMotion || !canVibrate) return;
-      if (frames - lastTick > 3) { navigator.vibrate(5); lastTick = frames; }
+      if (frames - lastTick > 3) { try { navigator.vibrate(5); } catch (_) {} lastTick = frames; }
     }
     function collidePegs() {
       for (const p of pegs) {
@@ -880,7 +880,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         return;
       }
-    } catch (e) { /* abgebrochen oder nicht unterstützt -> Vorschau */ }
+    } catch (e) {
+      if (e && e.name === "AbortError") return; // Nutzer hat das Teilen abgebrochen
+    }
     showSharePreview(dataUrl);
   }
 

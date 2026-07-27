@@ -27,6 +27,9 @@ supabase/.temp/
 # Claude memory (local only)
 .claude/
 
+# Alte/interne Arbeitsdateien – nicht deployen (legen DB-Struktur offen)
+_archive/
+
 # Optional: uncomment if you add a build step later
 # dist/
 # build/

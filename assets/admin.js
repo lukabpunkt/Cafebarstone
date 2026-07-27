@@ -2,6 +2,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
+  // HTML/Attribut-Escaping gegen XSS aus gastgelieferten Feldern
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   const loginForm = document.getElementById("admin-login-form");
   const loginMessage = document.getElementById("admin-login-message");
   const dashboard = document.getElementById("admin-dashboard");
@@ -167,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? new Date(row.confirmed_at).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: businessTz })
         : null;
       const confirmedByCell = confirmedByEmail
-        ? `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);">${confirmedByEmail}<br><span style="font-size:11px;opacity:0.7;">${confirmedAtStr}</span></span></td>`
+        ? `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);">${escapeHtml(confirmedByEmail)}<br><span style="font-size:11px;opacity:0.7;">${escapeHtml(confirmedAtStr)}</span></span></td>`
         : `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);opacity:0.4;">—</span></td>`;
       const showConfirm = row.status === "pending";
       const showReject = row.status === "pending";
@@ -179,16 +189,16 @@ document.addEventListener("DOMContentLoaded", () => {
         `data-time="${timeStr}"`,
         `data-area="${areaLabel}"`,
         `data-party-size="${row.party_size}"`,
-        fullName ? `data-name="${fullName}"` : "",
-        email ? `data-email="${email}"` : "",
-        phone ? `data-phone="${phone}"` : "",
-        notes ? `data-notes="${String(notes).replace(/"/g, "&quot;")}"` : "",
+        fullName ? `data-name="${escapeHtml(fullName)}"` : "",
+        email ? `data-email="${escapeHtml(email)}"` : "",
+        phone ? `data-phone="${escapeHtml(phone)}"` : "",
+        notes ? `data-notes="${escapeHtml(notes)}"` : "",
       ].filter(Boolean).join(" ");
 
       const actionAttrs = [
         `data-reservation-id="${row.id}"`,
-        email ? `data-email="${email}"` : "",
-        fullName ? `data-name="${fullName}"` : "",
+        email ? `data-email="${escapeHtml(email)}"` : "",
+        fullName ? `data-name="${escapeHtml(fullName)}"` : "",
         row.reservation_at ? `data-reservation-at="${row.reservation_at}"` : "",
         `data-area-label="${areaLabel}"`,
         `data-party-size="${row.party_size}"`,
@@ -208,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td data-label="Uhrzeit">${timeStr}</td>
           <td data-label="Bereich">${areaLabel}</td>
           <td data-label="Personen">${row.party_size}</td>
-          <td data-label="Name">${guest || "-"}</td>
+          <td data-label="Name">${escapeHtml(guest || "-")}</td>
           <td data-label="Status"><span class="${statusClass}">${statusLabel}</span></td>
           ${confirmedByCell}
           <td class="admin-actions-cell">${infoBtn}${confirmBtn}${rejectBtn}</td>
@@ -361,9 +371,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (payload.phone) contactParts.push(`Telefon: ${payload.phone}`);
     contactEl.textContent = contactParts.length > 0 ? contactParts.join("  •  ") : "Keine Kontaktdaten hinterlegt.";
 
-    notesEl.innerHTML = payload.notes
-      ? `<span class="modal-notes-label">Besondere Wünsche</span>${payload.notes}`
-      : `<span class="modal-notes-label">Besondere Wünsche</span>Keine besonderen Wünsche angegeben.`;
+    notesEl.innerHTML = '<span class="modal-notes-label">Besondere Wünsche</span>';
+    notesEl.appendChild(document.createTextNode(
+      payload.notes ? payload.notes : "Keine besonderen Wünsche angegeben."
+    ));
 
     overlay.classList.add("is-open");
     overlay.setAttribute("aria-hidden", "false");
