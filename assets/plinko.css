@@ -118,6 +118,11 @@
   min-height: 1em;
 }
 
+.plinko-start-btn,
+.plinko-drop-btn,
+.plinko-share-btn,
+.plinko-celebration-btn { gap: 8px; }
+
 .plinko-start-btn {
   width: 100%;
   min-height: 54px;

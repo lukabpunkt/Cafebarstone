@@ -13,7 +13,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Café Bar Stone" />
     <meta property="og:title" content="Plinko Shot-Game – Café Bar Stone" />
-    <meta property="og:description" content="Lasst mit euren Freunden die Kugel fallen und findet heraus, welchen Shot jeder an der Bar bestellt. 🍻" />
+    <meta property="og:description" content="Lasst mit euren Freunden die Kugel fallen und findet heraus, welchen Shot jeder an der Bar bestellt." />
     <meta property="og:url" content="https://lukabpunkt.github.io/Cafebarstone/plinko.html" />
     <meta property="og:image" content="https://lukabpunkt.github.io/Cafebarstone/assets/og-image.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -59,7 +59,7 @@
           <div id="plinko-setup" class="plinko-screen">
             <div class="plinko-intro">
               <p class="eyebrow">Café Bar Stone • Shot-Game</p>
-              <h1>Plinko 🎯</h1>
+              <h1>Plinko <svg class="pi" width="20" height="20" style="width:0.8em;height:0.8em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.3" r="1.7" fill="currentColor" stroke="none"/><path d="M7.6 9.5h8.8l-1.5 9.4a1.2 1.2 0 0 1-1.2 1h-3.4a1.2 1.2 0 0 1-1.2-1z"/><path d="M8.6 13h6.8"/></svg></h1>
               <p>
                 Gebt eure Namen ein, lasst reihum die Kugel fallen und lasst das
                 Glück entscheiden – am Ende zeigt euch die Liste, welchen Shot
@@ -78,11 +78,12 @@
               </span>
               <label class="plinko-toggle">
                 <input type="checkbox" id="plinko-bet-toggle" />
-                <span>🎯 Vorhersage-Wette – jeder tippt vor dem Wurf auf einen Shot</span>
+                <span><svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg> Vorhersage-Wette – jeder tippt vor dem Wurf auf einen Shot</span>
               </label>
               <p id="plinko-setup-error" class="plinko-error" aria-live="polite"></p>
               <button type="button" id="plinko-start" class="btn btn-primary plinko-start-btn">
-                Los geht's 🎉
+                <svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l1.7 5.1 5.1 1.7-5.1 1.7L12 16.8l-1.7-5.1L5.2 10l5.1-1.7z" fill="currentColor"/></svg>
+                Los geht's
               </button>
             </div>
           </div>
@@ -128,10 +129,12 @@
             <ul id="plinko-results-list" class="plinko-results-list"></ul>
             <div class="plinko-results-actions">
               <button type="button" id="plinko-share" class="btn btn-primary plinko-share-btn">
-                Als Story teilen 📲
+                <svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8.5 7.5 12 4l3.5 3.5"/><path d="M5 12.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6.5"/></svg>
+                Als Story teilen
               </button>
               <button type="button" id="plinko-save" class="btn btn-outline plinko-share-btn">
-                Bild speichern 📷
+                <svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M8.5 11.5 12 15l3.5-3.5"/><path d="M5 12.5V19a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6.5"/></svg>
+                Bild speichern
               </button>
               <button type="button" id="plinko-restart" class="btn btn-outline plinko-share-btn">
                 Nochmal spielen
@@ -174,7 +177,8 @@
       <canvas id="plinko-confetti" class="plinko-confetti"></canvas>
       <div class="plinko-celebration-inner">
         <p class="plinko-celebration-eyebrow">
-          🎉 <span id="celebration-player">Spieler</span> trinkt
+          <svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l1.7 5.1 5.1 1.7-5.1 1.7L12 16.8l-1.7-5.1L5.2 10l5.1-1.7z" fill="currentColor"/></svg>
+          <span id="celebration-player">Spieler</span> trinkt
         </p>
         <p id="celebration-shot" class="plinko-celebration-shot">—</p>
         <p id="celebration-tags" class="plinko-celebration-tags"></p>
@@ -196,7 +200,7 @@
             <li>Bild speichern</li>
             <li>Instagram oder Snapchat öffnen</li>
             <li>Neue Story → dieses Bild auswählen</li>
-            <li>Posten 🎉</li>
+            <li>Posten</li>
           </ol>
         </div>
         <div class="plinko-share-preview-actions">

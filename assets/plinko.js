@@ -124,6 +124,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const COL_TEXT = readToken("--color-text", "#f7f3ea");
   const COL_TEXT_SOFT = readToken("--color-text-soft", "#c1bccf");
 
+  // Exklusive Stone-Icons (SVG, erben Farbe via currentColor)
+  const ICON = {
+    shot: '<svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.8 6.5h8.4l-1.5 12a1.2 1.2 0 0 1-1.2 1h-3a1.2 1.2 0 0 1-1.2-1z"/><path d="M8.5 11h7"/></svg>',
+    sparkle: '<svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l1.7 5.1 5.1 1.7-5.1 1.7L12 16.8l-1.7-5.1L5.2 10l5.1-1.7z" fill="currentColor"/></svg>',
+    target: '<svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg>',
+    arrow: '<svg class="pi" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg>',
+  };
+
   function showScreen(screen) {
     [setupScreen, gameScreen, resultsScreen].forEach((s) => {
       if (s) s.classList.toggle("is-hidden", s !== screen);
@@ -654,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (dbl) {
         const t = document.createElement("span");
         t.className = "plinko-cel-tag is-double";
-        t.textContent = "🥃 DOPPELTER SHOT!";
+        t.innerHTML = ICON.shot + " DOPPELTER SHOT!";
         celTagsEl.appendChild(t);
       }
       if (betWon) {
@@ -665,15 +673,17 @@ document.addEventListener("DOMContentLoaded", () => {
           const payer = others[Math.floor(Math.random() * others.length)];
           const b = document.createElement("b");
           b.textContent = payer.name;
-          t.append("🎯 Richtig getippt! ", b, " gibt dir aus! 🍻");
+          t.innerHTML = ICON.target + " ";
+          t.append("Richtig getippt! ", b, " gibt dir aus!");
         } else {
-          t.textContent = "🎯 Richtig getippt – die Runde geht aufs Haus! 🍻";
+          t.innerHTML = ICON.target + " ";
+          t.append("Richtig getippt – die Runde geht aufs Haus!");
         }
         celTagsEl.appendChild(t);
       }
     }
     if (nextBtn) {
-      nextBtn.textContent = currentIndex >= players.length - 1 ? "Ergebnis anzeigen 🎊" : "Nächster Spieler →";
+      nextBtn.innerHTML = currentIndex >= players.length - 1 ? (ICON.sparkle + " Ergebnis anzeigen") : ("Nächster Spieler " + ICON.arrow);
     }
     celebrationVisible = true;
     if (celebration) {
@@ -782,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
     drawSpaced(g, "PLINKO · SHOT-GAME", CW / 2, 476, 7);
     g.fillStyle = "#f7f3ea";
     g.font = "800 72px -apple-system, system-ui, sans-serif";
-    g.fillText("Wer trinkt was? 🍻", CW / 2, 566);
+    g.fillText("Wer trinkt was?", CW / 2, 566);
 
     // Divider oben
     g.strokeStyle = "rgba(255,255,255,0.12)"; g.lineWidth = 2;
@@ -881,7 +891,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await navigator.share({
           files: [file],
           title: "Café Bar Stone · Plinko",
-          text: "Wer trinkt was? 🍻 #cafebarstone",
+          text: "Wer trinkt was? #cafebarstone",
         });
         return;
       }

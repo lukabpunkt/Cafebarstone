@@ -282,6 +282,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 11px 26px;
   border-radius: var(--radius-pill);
   border: 1px solid transparent;
@@ -319,6 +320,14 @@ body {
 .btn-outline:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* Exklusive Inline-Icons im Stone-Design (erben Farbe via currentColor) */
+.pi {
+  width: 1.1em;
+  height: 1.1em;
+  flex: 0 0 auto;
+  vertical-align: -0.16em;
 }
 
 .btn-outline {
