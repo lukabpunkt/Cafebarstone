@@ -342,26 +342,42 @@ body {
   color: var(--color-text);
 }
 
-/* Auffälliger, glowy Game-CTA (Plinko) */
-.plinko-cta {
-  background: var(--color-accent-soft);
-  border-color: rgba(201, 155, 75, 0.6);
-  color: var(--color-accent);
-  box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.25), 0 8px 30px rgba(201, 155, 75, 0.4);
-  animation: plinko-cta-glow 2.4s ease-in-out infinite;
-}
-.plinko-cta:hover {
+/* Auffälliger, glowy Game-CTA (Plinko) – Rundum-Halo, auch auf Handys sichtbar */
+.btn.plinko-cta {
   background: var(--color-accent-strong);
   border-color: rgba(201, 155, 75, 0.85);
+  color: var(--color-accent);
+  box-shadow:
+    0 0 0 1px rgba(201, 155, 75, 0.45),
+    0 0 20px rgba(201, 155, 75, 0.6),
+    0 6px 34px rgba(201, 155, 75, 0.5);
+  animation: plinko-cta-glow 2s ease-in-out infinite;
+}
+.btn.plinko-cta:hover {
+  background: rgba(201, 155, 75, 0.3);
+  border-color: var(--color-accent);
   color: var(--color-text);
   transform: translateY(-1px);
 }
 @keyframes plinko-cta-glow {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.22), 0 6px 20px rgba(201, 155, 75, 0.3); }
-  50% { box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.5), 0 12px 44px rgba(201, 155, 75, 0.62); }
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(201, 155, 75, 0.4),
+      0 0 14px rgba(201, 155, 75, 0.45),
+      0 6px 26px rgba(201, 155, 75, 0.42);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(201, 155, 75, 0.65),
+      0 0 30px rgba(201, 155, 75, 0.85),
+      0 10px 48px rgba(201, 155, 75, 0.7);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .plinko-cta { animation: none; }
+  .btn.plinko-cta {
+    animation: none;
+    box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.5), 0 0 22px rgba(201, 155, 75, 0.65);
+  }
 }
 
 /* ============================================================
