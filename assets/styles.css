@@ -342,6 +342,28 @@ body {
   color: var(--color-text);
 }
 
+/* Auffälliger, glowy Game-CTA (Plinko) */
+.plinko-cta {
+  background: var(--color-accent-soft);
+  border-color: rgba(201, 155, 75, 0.6);
+  color: var(--color-accent);
+  box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.25), 0 8px 30px rgba(201, 155, 75, 0.4);
+  animation: plinko-cta-glow 2.4s ease-in-out infinite;
+}
+.plinko-cta:hover {
+  background: var(--color-accent-strong);
+  border-color: rgba(201, 155, 75, 0.85);
+  color: var(--color-text);
+  transform: translateY(-1px);
+}
+@keyframes plinko-cta-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.22), 0 6px 20px rgba(201, 155, 75, 0.3); }
+  50% { box-shadow: 0 0 0 1px rgba(201, 155, 75, 0.5), 0 12px 44px rgba(201, 155, 75, 0.62); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plinko-cta { animation: none; }
+}
+
 /* ============================================================
    Eyebrow label
    ============================================================ */
