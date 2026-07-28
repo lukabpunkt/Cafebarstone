@@ -589,6 +589,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fitCanvas();
     renderLegend();
     beginTurn();
+    // Automatisch in den Vollbild-/Immersive-Modus (innerhalb der Klick-Geste erlaubt)
+    setImmersive(true);
   }
 
   function beginTurn() {
