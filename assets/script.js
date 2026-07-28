@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const timeField = document.getElementById("time");
   if (timeField instanceof HTMLInputElement) {
-    timeField.setAttribute("min", "17:00");
+    timeField.setAttribute("min", "19:00");
     timeField.setAttribute("max", "20:00");
   }
 
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let reservationsOpen = true;
   let openingDays = [4, 5, 6]; // Fallback: Do, Fr, Sa
-  let openFromHour = 17;       // Fallback: 17:00
+  let openFromHour = 19;       // Fallback: 19:00
   let lastSlotHour = 20;       // Fallback: 20:00
 
   function isWithinOpeningHours(dateValue, timeValue) {

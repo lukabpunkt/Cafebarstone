@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
 
   // --- Öffnungszeiten & Status aus DB laden (Fallback auf hardcoded Werte) ---
   let openDays = [4, 5, 6];
-  let openFromHour = 17;
+  let openFromHour = 19;
   let lastSlotHour = 20;
   let reservationsOpen = true;
   try {
