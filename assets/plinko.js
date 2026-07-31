@@ -404,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const { P, n, slotTop, bounds, ballR, pegR, pegs, floorY } = BOARD;
     const gravity = 0.13, restitution = 0.66, wallRest = 0.5, jitterAmt = 1.3;
     const maxV = ballR * 0.62, SUB = 3;
-    const SPEED = 0.5; // globaler Tempo-Regler (kleiner = langsamer)
+    const SPEED = 0.75; // globaler Tempo-Regler (kleiner = langsamer)
 
     const ball = {
       x: W / 2 + (Math.random() - 0.5) * (bounds[n] - bounds[0]) * 0.12,
