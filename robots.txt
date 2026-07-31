@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /management-stone.html
 
-Sitemap: https://lukabpunkt.github.io/Cafebarstone/sitemap.xml
+Sitemap: https://cafebarstone.de/sitemap.xml

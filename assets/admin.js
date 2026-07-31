@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? new Date(row.confirmed_at).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: businessTz })
         : null;
       const confirmedByCell = confirmedByEmail
-        ? `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);">${escapeHtml(confirmedByEmail)}<br><span style="font-size:11px;opacity:0.7;">${escapeHtml(confirmedAtStr)}</span></span></td>`
+        ? `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);">${escapeHtml(confirmedByEmail)}<br><span style="font-size:11px;opacity:0.7;">${escapeHtml(confirmedAtStr || "")}</span></span></td>`
         : `<td data-label="Bearbeitet von"><span style="font-size:12px;color:var(--color-text-soft);opacity:0.4;">—</span></td>`;
       const showConfirm = row.status === "pending";
       const showReject = row.status === "pending";

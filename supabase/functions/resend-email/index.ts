@@ -9,7 +9,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const ALLOWED_ORIGINS = [
-  "https://lukabpunkt.github.io",
+  "https://cafebarstone.de",
+  "https://www.cafebarstone.de",
   "http://localhost",
   "http://127.0.0.1",
 ];

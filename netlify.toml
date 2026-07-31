@@ -1,0 +1,36 @@
+# Netlify-Konfiguration – Café Bar Stone (cafebarstone.de)
+# Statische Seite: alle HTML liegen im Repo-Root, kein Build-Schritt.
+
+[build]
+  publish = "."
+  command = ""
+
+# www -> apex (301), erzwungen
+[[redirects]]
+  from = "https://www.cafebarstone.de/*"
+  to = "https://cafebarstone.de/:splat"
+  status = 301
+  force = true
+
+# Nicht-öffentliche Ordner sperren (werden mit-deployt, aber nicht abrufbar)
+[[redirects]]
+  from = "/supabase/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/_archive/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+# Sicherheits-Header für alle Seiten
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"

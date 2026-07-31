@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const ctx = canvas.getContext("2d");
 
   const MAX_PLAYERS = 10;
-  const GAME_URL = "lukabpunkt.github.io/Cafebarstone/plinko.html";
+  const GAME_URL = "cafebarstone.de/plinko.html";
   const reducedMotion = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const canVibrate = typeof navigator !== "undefined" && "vibrate" in navigator;

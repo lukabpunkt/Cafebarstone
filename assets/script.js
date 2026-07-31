@@ -134,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data, error } = await supabaseClient
         .from("business_settings")
         .select("reservations_open, open_days, open_from_hour, last_slot_hour")
+        .order("id", { ascending: true })
         .limit(1);
       if (error) {
         console.error("business_settings:", error);
