@@ -12,6 +12,18 @@
   status = 301
   force = true
 
+# Favicon/Touch-Icon im Domain-Root bereitstellen (Rewrite, kein Redirect)
+# Crawler/Browser suchen per Konvention zuerst /favicon.ico im Root.
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/assets/favicon.ico"
+  status = 200
+
+[[redirects]]
+  from = "/apple-touch-icon.png"
+  to = "/assets/apple-touch-icon.png"
+  status = 200
+
 # Nicht-öffentliche Ordner sperren (werden mit-deployt, aber nicht abrufbar)
 [[redirects]]
   from = "/supabase/*"
