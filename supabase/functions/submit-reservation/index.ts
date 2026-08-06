@@ -12,6 +12,8 @@ const ALLOWED_ORIGINS = [
   "http://127.0.0.1",
 ];
 
+const ADMIN_URL = "https://cafebarstone.de/management-stone.html";
+
 const SALUTATION_MAP: Record<string, string> = {
   Herr: "mr",
   Frau: "mrs",
@@ -30,14 +32,15 @@ function escapeHtml(s: string): string {
 
 function buildOwnerEmailHtml(p: {
   name: string; email: string; phone: string; dateStr: string;
-  timeStr: string; areaLabel: string; partySize: number; notes: string;
+  timeStr: string; areaLabel: string; partySize: number; notes: string; dateIso: string;
 }): string {
+  const adminLink = `${ADMIN_URL}?date=${encodeURIComponent(p.dateIso)}`;
   const row = (l: string, v: string) =>
     `<tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);font:600 11px -apple-system,sans-serif;letter-spacing:0.1em;text-transform:uppercase;color:#c1bccf;width:38%;">${l}</td><td style="padding:8px 0 8px 12px;border-bottom:1px solid rgba(255,255,255,0.08);font:15px -apple-system,sans-serif;color:#f7f3ea;">${escapeHtml(v)}</td></tr>`;
   const notesRow = p.notes
     ? `<tr><td colspan="2" style="padding:14px 0 0;"><p style="margin:0 0 6px;font:600 11px -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#c99b4b;">Besondere Wünsche</p><p style="margin:0;font:14px -apple-system,sans-serif;line-height:1.6;color:#c1bccf;border-left:3px solid rgba(201,155,75,0.5);padding:8px 12px;background:#080a0f;">${escapeHtml(p.notes)}</p></td></tr>`
     : "";
-  return `<!DOCTYPE html><html lang="de"><body style="margin:0;background:#07090c;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><table role="presentation" width="100%" style="max-width:520px;margin:0 auto;background:#10131a;border:1px solid rgba(255,255,255,0.12);border-radius:16px;"><tr><td style="padding:22px 22px 6px;"><p style="margin:0 0 4px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#c99b4b;">Café Bar Stone · Lingen (Ems)</p><h1 style="margin:0;font-size:22px;font-weight:500;color:#f7f3ea;">Neue Reservierungsanfrage</h1></td></tr><tr><td style="padding:14px 22px 22px;"><table role="presentation" width="100%" style="border-collapse:collapse;">${row("Datum", p.dateStr)}${row("Uhrzeit", p.timeStr)}${row("Bereich", p.areaLabel)}${row("Personen", String(p.partySize))}${row("Name", p.name)}${row("E-Mail", p.email)}${row("Telefon", p.phone)}${notesRow}</table><p style="margin:18px 0 0;font-size:13px;color:#8a8499;">Zum Bestätigen im Admin-Dashboard einloggen.</p></td></tr></table></body></html>`;
+  return `<!DOCTYPE html><html lang="de"><body style="margin:0;background:#07090c;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"><table role="presentation" width="100%" style="max-width:520px;margin:0 auto;background:#10131a;border:1px solid rgba(255,255,255,0.12);border-radius:16px;"><tr><td style="padding:22px 22px 6px;"><p style="margin:0 0 4px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#c99b4b;">Café Bar Stone · Lingen (Ems)</p><h1 style="margin:0;font-size:22px;font-weight:500;color:#f7f3ea;">Neue Reservierungsanfrage</h1></td></tr><tr><td style="padding:14px 22px 22px;"><table role="presentation" width="100%" style="border-collapse:collapse;">${row("Datum", p.dateStr)}${row("Uhrzeit", p.timeStr)}${row("Bereich", p.areaLabel)}${row("Personen", String(p.partySize))}${row("Name", p.name)}${row("E-Mail", p.email)}${row("Telefon", p.phone)}${notesRow}</table><table role="presentation" width="100%" style="margin:22px 0 0;"><tr><td align="center"><a href="${adminLink}" style="display:inline-block;background:#c99b4b;color:#0b0d12;font:600 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;padding:13px 30px;border-radius:10px;">Reservierung im Dashboard bestätigen &rarr;</a></td></tr></table><p style="margin:12px 0 0;font-size:12px;color:#8a8499;text-align:center;">Öffnet das Admin-Dashboard &ndash; einmalige Anmeldung nötig.</p></td></tr></table></body></html>`;
 }
 
 function getCorsHeaders(req: Request): Record<string, string> {
@@ -223,8 +226,9 @@ Deno.serve(async (req) => {
       const timeStr = reservationDateTime.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: tz });
       const areaLabel = areaCode === "smoking" ? "Raucherbereich" : "Nichtraucherbereich";
       const fullName = `${firstName} ${lastName}`.trim();
-      const html = buildOwnerEmailHtml({ name: fullName, email, phone, dateStr, timeStr, areaLabel, partySize: partySizeRaw, notes });
-      const text = `Neue Reservierungsanfrage – Café Bar Stone\n\nDatum: ${dateStr}\nUhrzeit: ${timeStr}\nBereich: ${areaLabel}\nPersonen: ${partySizeRaw}\nName: ${fullName}\nE-Mail: ${email}\nTelefon: ${phone}${notes ? `\n\nBesondere Wünsche:\n${notes}` : ""}`;
+      const html = buildOwnerEmailHtml({ name: fullName, email, phone, dateStr, timeStr, areaLabel, partySize: partySizeRaw, notes, dateIso: dateValue });
+      const adminLink = `${ADMIN_URL}?date=${encodeURIComponent(dateValue)}`;
+      const text = `Neue Reservierungsanfrage – Café Bar Stone\n\nDatum: ${dateStr}\nUhrzeit: ${timeStr}\nBereich: ${areaLabel}\nPersonen: ${partySizeRaw}\nName: ${fullName}\nE-Mail: ${email}\nTelefon: ${phone}${notes ? `\n\nBesondere Wünsche:\n${notes}` : ""}\n\nZum Bestätigen im Dashboard: ${adminLink}`;
       await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${RESEND_API_KEY}` },

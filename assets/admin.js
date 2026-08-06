@@ -73,6 +73,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (dateToInput instanceof HTMLInputElement) dateToInput.value = todayStr;
   }
 
+  // Datum aus ?date=YYYY-MM-DD (Deep-Link aus der Owner-Mail) vorbelegen
+  function applyInitialDateRange() {
+    const dateParam = new URLSearchParams(window.location.search).get("date");
+    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      if (dateFromInput instanceof HTMLInputElement) dateFromInput.value = dateParam;
+      if (dateToInput instanceof HTMLInputElement) dateToInput.value = dateParam;
+      return true;
+    }
+    return false;
+  }
+
   if (dateFromInput instanceof HTMLInputElement) {
     dateFromInput.addEventListener("change", () => {
       if (dateToInput instanceof HTMLInputElement && dateFromInput.value) {
@@ -399,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function enterDashboard() {
     if (dashboard) dashboard.style.display = "block";
     if (logoutBtn) logoutBtn.classList.add("is-visible");
-    setToday();
+    if (!applyInitialDateRange()) setToday();
     loadBusinessSettings(true);
     loadReservationsForDateRange();
   }
